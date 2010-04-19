@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GlueMap xmlns="http://glue.seanhess.net/2009"
+		 xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/halo"
+		 xmlns:bifff="http://bifff.seanhess.net/2009" xmlns:controllers="com.amberalert.desktop.controllers.*" xmlns:views="com.amberalert.desktop.views.*">
+	<fx:Script>
+		<![CDATA[
+			import com.amberalert.desktop.models.Destinations;
+		]]>
+	</fx:Script>
+	
+	
+	<controllers:ApplicationController id="app" alertExists="{alerts.alertExists}" setToFirstRun="nav.setCurrentView(Destinations.FIRST_RUN)"
+									   setToNotification="nav.setCurrentView(Destinations.NOTIFICATION)" setToSafety="nav.setCurrentView(Destinations.SAFETY_TIPS)"/>
+	<controllers:FirstRunApplicationController id="frapp" />
+	<views:MainView id="mainview" />
+	<controllers:AlertController id="alerts"/>
+	<controllers:SafetyTipController id="safetytips"/>
+	
+	<controllers:NavigationController id="nav" alertExists="{alerts.alertExists}"/>
+	
+	<Command id="init" stage="none">
+		<Action call="nav.loadNav(scope.stage)"/>
+		<Action call="app.grabUserObject()"/>
+	</Command>
+	
+	<Glue match="DesktopNotifier">
+		<Route event="closing" call="mainview.closeMe(event)" />
+	</Glue>
+
+	<Glue match="MainView">
+		<Inject currentState="{nav.currentState}" />
+		<Inject alertExists="{alerts.alertExists}"/>
+		<Route event="initialLoad" call="init.execute({stage:view.stage})"/>
+		<Route event="dontClose" call="nav.closeSetupWarning()"/>
+		<Route event="setupComplete" call="app.setupComplete()"/>
+		<Route event="{Destinations.FIRST_RUN}" call="{nav.setCurrentView(Destinations.FIRST_RUN)}" />
+		<Route event="{Destinations.ABOUT}" call="{nav.setCurrentView(Destinations.ABOUT)}" />
+		<Route event="{Destinations.DOCKED}" call="{nav.setCurrentView(Destinations.DOCKED)}" />
+		<Route event="{Destinations.NOTIFICATION}" call="{nav.setCurrentView(Destinations.NOTIFICATION)}" />
+		<Route event="{Destinations.SAFETY_TIPS}" call="{nav.setCurrentView(Destinations.SAFETY_TIPS)}" />
+		<Route event="{Destinations.SETTINGS}" call="{nav.setCurrentView(Destinations.SETTINGS)}" />
+	</Glue>
+	
+	<Glue match="SafetyTipsView">
+		<Inject currentSafetyTip="{safetytips.currentTip}"/>
+	</Glue>
+	
+	<Glue match="NotificationView">
+		<Inject currentAlert="{alerts.currentAlert}"/>
+	</Glue>
+	
+</GlueMap>

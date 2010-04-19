@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group width="100%" height="100%" 
+		 xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/halo"  
+		 xmlns:models="com.amberalert.desktop.models.*" 
+		 xmlns:views="com.amberalert.desktop.views.*"
+		 creationComplete="onLoad()" >
+	<fx:Script>
+		<![CDATA[
+			import com.amberalert.desktop.models.*;
+			
+			import flash.desktop.*;
+			import flash.display.*;
+			import flash.events.Event;
+			
+			public function onLoad():void 
+			{
+				dispatchEvent(new Event('initialLoad'));	
+				
+			}
+			
+			public function set alertExists(value:Boolean):void
+			{
+				if(currentState != Destinations.FIRST_RUN)
+				{
+					if(value)
+						dispatchEvent(new Event(Destinations.NOTIFICATION));
+					else
+						dispatchEvent(new Event(Destinations.SAFETY_TIPS));	
+				}
+			}
+			
+			public function closeMe(evt:Event):void 
+			{
+				evt.preventDefault();
+				dispatchEvent(new Event('dontClose'));
+			}
+
+			protected function navigateTo(destination:String):void
+			{
+				dispatchEvent(new Event(destination));
+			}
+			
+			protected function setupComplete():void
+			{
+				dispatchEvent(new Event('setupComplete'));
+			}
+		]]>
+	</fx:Script>
+	<s:states>
+		<s:State name="firstrun"/>
+		<s:State name="docked"/>
+		<s:State name="notification"/>
+		<s:State name="safetytips"/>
+		<s:State name="settings"/>
+		<s:State name="about"/>
+	</s:states>
+	<fx:Declarations>
+		<models:User id="user" />
+	</fx:Declarations>
+	<views:FirstRunView id="fr" includeInLayout="false" closeSetup="closeMe(event)" finishSetup="setupComplete()" includeIn="firstrun"/>
+	<views:NotificationView id="notification" includeIn="notification" />
+	<views:SafetyTipsView id="safetytips" includeIn="safetytips"/>
+	<views:SettingsView id="settings" includeIn="settings"/>
+	<s:Label includeIn="about" x="178" y="41" text="About us..."/>
+	<!--<s:HGroup>
+		
+		<s:Button label="first run" click="navigateTo(Destinations.FIRST_RUN)" />
+		<s:Button label="docked" click="navigateTo(Destinations.DOCKED)" />
+		<s:Button label="notification" click="navigateTo(Destinations.NOTIFICATION)" />
+		<s:Button label="safety tips" click="navigateTo(Destinations.SAFETY_TIPS)" />
+		<s:Button label="settings" click="navigateTo(Destinations.SETTINGS)" />
+		<s:Button label="about" click="navigateTo(Destinations.ABOUT)" />	
+	</s:HGroup>-->
+	
+
+</s:Group>
