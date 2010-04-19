@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/halo" width="100%" height="100%">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
 
 	<s:layout><s:VerticalLayout/></s:layout>
 
@@ -9,6 +9,7 @@
 	<fx:Script>
 		<![CDATA[
 			import com.amberalert.desktop.models.AMBERAlert;
+			import com.amberalert.desktop.models.Data;
 			import com.amberalert.desktop.models.Location;
 			import com.amberalert.desktop.models.Person;
 			import com.amberalert.desktop.models.Vehicle;
@@ -25,7 +26,10 @@
 			
 			import flash.events.Event;
 			import flash.events.MouseEvent;
-
+			
+			[Bindable] public var alertExists:Boolean;
+			
+			[Bindable]
 			public function set currentAlert(value:AMBERAlert):void
 			{
 				if(value != null)
@@ -50,46 +54,88 @@
 				}
 			}
 			
+			public function get currentAlert():AMBERAlert
+			{
+				return _currentAlert;
+			}
 			
-			protected function image1_clickHandler(event:MouseEvent):void
+			
+			protected function alertSiteInfo_clickHandler(event:MouseEvent):void
 			{
 				//URL to the alert is constructed and opened in new tab
 				var req:URLRequest = new URLRequest('http://amberalert.com/' + _currentAlert.uid);
 				navigateToURL(req, "_blank");
 			}
-
+			
+			protected function mapImage_clickHandler(event:MouseEvent):void
+			{
+				// opens URL to map image
+				var reqMap:URLRequest = new URLRequest("http://maps.google.com/maps/api/staticmap?center=" + _currentLocation.lastSeenLat + "," + _currentLocation.lastSeenLon + "&zoom=15&size=600x500&sensor=false");
+				navigateToURL(reqMap, "_blank");
+			}
 			
 			protected function nextAlert():void
 			{
-				//TODO dispatch an event to be routed to glue and then routed to alertscontroller
-				//if (index < alertCount - 1)
-				//	index++;
-				//else
-				//	index = 0;
+				// dispatch an event to be routed to glue and then routed to alertscontroller
+				dispatchEvent(new Event('nextAlert'));
 			}
 			
 			protected function prevAlert():void
 			{
-				//TODO dispatch an event to be routed to glue and then routed to alertscontroller
-				//if (index > 0)
-				//	index--;
-				//else
-				//	index = alertCount - 1;
+				// dispatch an event to be routed to glue and then routed to alertscontroller
+				dispatchEvent(new Event('prevAlert'));
+			}
+			
+			protected function listView():void
+			{
+				// dispatch an event to be routed to glue and then routed to alertscontroller
+				dispatchEvent(new Event('listView'));
 			}
 		]]>
 	</fx:Script>
-	
 
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<s:Label  text="AMBER Alert"/>
-	<s:Group>
+	<s:Label text="No ACTIVE AMBER Alerts" visible="{!alertExists}" includeInLayout="{!alertExists}"/>
+	
+	<!--
+	<s:Label text="AMBER Alerts" visible="{alertExists}" includeInLayout="{alertExists}"/>
+	<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
+		<s:layout><s:HorizontalLayout/></s:layout>
+		<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
+			<s:layout><s:VerticalLayout/></s:layout>
+			<s:Label text = "Victims"/>
+		</s:Group>
+		<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
+			<s:layout><s:VerticalLayout/></s:layout>
+			<s:Label text = "Victims Name"/>
+		</s:Group>
+		<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
+			<s:layout><s:VerticalLayout/></s:layout>
+			<s:Label text = "Description"/>
+			<s:Label  text= "{currentAlert.description}"/>
+		</s:Group>
+		<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
+			<s:layout><s:VerticalLayout/></s:layout>
+			<s:Label text = "Get the word out"/>
+		</s:Group>
+	</s:Group>
+	
+	<mx:Button label="Back to List" click= "()"/>
+	-->
+	
+	<s:Label  text="AMBER Alert" visible="{alertExists}" includeInLayout="{alertExists}"/>
+	<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
+		<s:layout><s:HorizontalLayout/></s:layout>
+		<mx:Button label="Return to list" click= "listView()"/>
+	</s:Group>
+	<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
 		<s:layout><s:HorizontalLayout/></s:layout>
 		<s:Group>
 			<s:layout><s:VerticalLayout/></s:layout>
 			<s:Label  text="Victim"/>
-			<mx:Image  width="200" height="200" click= "image1_clickHandler(event)" source="{_currentVictim.picture}"/>
+			<mx:Image  width="200" height="200" click= "alertSiteInfo_clickHandler(event)" source="{_currentVictim.picture}"/>
 			<mx:Form>			
 				<mx:FormItem label = "Name:">
 					<s:Label  text= "{_currentVictim.name}"/>			
@@ -117,7 +163,7 @@
 		<s:Group>
 			<s:layout><s:VerticalLayout/></s:layout>
 			<s:Label  text="Suspect"/>
-			<mx:Image  width="200" height="200" click= "image1_clickHandler(event)" source="{_currentSuspect.picture}"/>
+			<mx:Image  width="200" height="200" click= "alertSiteInfo_clickHandler(event)" source="{_currentSuspect.picture}"/>
 			<mx:Form>				
 				<mx:FormItem label = "Name:">
 					<s:Label  text="{_currentSuspect.name}"/>			
@@ -145,7 +191,7 @@
 		<s:Group>
 			<s:layout><s:VerticalLayout/></s:layout>
 			<s:Label  text="Vehicle"/>
-			<mx:Image  width="200" height="200" click= "image1_clickHandler(event)" source="{_currentVehicle.picture}"/>
+			<mx:Image  width="200" height="200" click= "alertSiteInfo_clickHandler(event)" source="{_currentVehicle.picture}"/>
 			<mx:Form>
 				
 				<mx:FormItem label = "Make:">
@@ -168,7 +214,7 @@
 		<s:Group>
 			<s:layout><s:VerticalLayout/></s:layout>
 			<s:Label  text="Location"/>
-			<mx:Image  id="mapImage" width="200" height="200" source="{googleMapLink}" click= "image1_clickHandler(event)" />
+			<mx:Image  id="mapImage" width="200" height="200" source="{googleMapLink}" click= "mapImage_clickHandler(event)" />
 			<mx:Form>				
 				<mx:FormItem label = "City:">
 					<s:Label  text="{_currentLocation.city}"/>			
@@ -179,7 +225,7 @@
 			</mx:Form>			
 		</s:Group>
 	</s:Group>
-	<s:Group>
+	<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
 		<s:layout><s:HorizontalLayout/></s:layout>
 		<mx:Button label="Prev" click= "prevAlert()"/>
 		<mx:Button label="Next" click= "nextAlert()"/>

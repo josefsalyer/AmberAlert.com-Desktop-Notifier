@@ -1,6 +1,7 @@
 package com.amberalert.desktop.models
 {
 	
+	
 
 	/**
 	 * The user model.  Mostly a singleton used to track the current logged in user's preferences
@@ -17,6 +18,7 @@ package com.amberalert.desktop.models
 	 * */
 	
 	[RemoteClass]
+	[Bindable]
 	public class User
 	{
 		/**
@@ -36,11 +38,11 @@ package com.amberalert.desktop.models
 		public var cellProvider		:String		=	"";
 		
 		/**
-		 * a 5 digit zip code for the user
+		 * A regional representation of the area that the user would like to receive alerts for.
 		 * */
-		public var zip :String;
+		public var province			:String		=	null;
 		
-		public var province		:String		=	"";
+		public var serviceProvider :String	= 	"";
 		
 		/**
 		 * this value is set to true initially so that alerts are stored in the LSO of the users computer
@@ -51,7 +53,7 @@ package com.amberalert.desktop.models
 		/**
 		 * this value is set to true initially so that alerts are sent to the user's email
 		 * */
-		public var subscribeEmail	:Boolean	=	true;
+		public var subscribeEmail	:Boolean	=	false;
 		
 		/**
 		 * this gives the option for the user to receive alerts via SMS.
@@ -62,5 +64,11 @@ package com.amberalert.desktop.models
 		 * this gives the option for the user to receive alerts via RSS Feed.
 		 * */
 		public var subscribeRSS		:Boolean	=	false;
+		
+		/**
+		 * Boolean representation of whether the user has completed the firstrun setup.
+		 * */
+		public var firstRunCompleted	:Boolean	=	false;
+		 
 	}
 }

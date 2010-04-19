@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/halo">	
+	<fx:Metadata>
+		[Event(name="validZipcode",type="flash.events.Event")]
+		[Event(name="invalidZipcode",type="flash.events.Event")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import flash.events.Event;
+			[Bindable] public var text:String;
+			[Bindable] public var isValid:Boolean;
+			
+			private function validInput():void
+			{
+				isValid = true;
+				dispatchEvent(new Event('validZipcode'));
+			}
+			
+			private function invalidInput():void
+			{
+				isValid = false;
+				dispatchEvent(new Event('invalidZipcode'));
+			}
+
+			protected function textInput_valueCommitHandler(event:FlexEvent):void
+			{
+				text = textInput.text;
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:ZipCodeValidator source="{textInput}" domain="US or Canada" property="text"  required="true" trigger="{textInput}" triggerEvent="valueCommit" valid="validInput()" invalid="invalidInput()"/>
+	</fx:Declarations>
+	<s:TextInput id="textInput" text="{text}" valueCommit="textInput_valueCommitHandler(event)"/>
+</s:Group>

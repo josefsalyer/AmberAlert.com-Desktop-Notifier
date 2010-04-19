@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/halo" width="100%" height="100%">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:components="com.amberalert.desktop.views.components.*" xmlns:lookups="com.amberalert.desktop.models.lookups.*">
+
 	<fx:Metadata>
 		[Event(name="closeSetup", type="flash.events.Event")]
 		[Event(name="finishSetup", type="flash.events.Event")]
@@ -13,71 +14,106 @@
 			import flash.events.Event;
 			
 			import mx.controls.Alert;
-			public var sharedObj:SharedObject;
-			public var userPrefs:User;
+			import mx.controls.TextInput;
 			
-			private function isValid_Phone(phone:String):Boolean{
-				//TODO: Complete this function.
-				// I have some pre-coded classes that can take care of this.
-				return true;
-			}
+			private var _userPrefs:User;
 			
-			private function isValid_Email(email:String):Boolean{
-				//TODO: Complete this function.
-				// I have some pre-coded classes that can take care of this.
-				if(email.length == 0)
-					return false;
-				else
-					return true;
-			}
-			
-			private function isValid_ZIPCode(zip:String):Boolean{
-				if(zip.length == 0 || (zip.length == 5 && !isNaN(Number(zip))))
-					return true;
-				else
-					return false;
-			}
-			
-			private function saveAllFields():void{
-				userPrefs = new User();
-				userPrefs.email = txtEmail.text;
-				userPrefs.cellNumber = txtCell.text;
-				//userPrefs.zip = txtZip.text;
-				userPrefs.subscribeSMS = chkSMS.selected;
-				userPrefs.subscribeRSS = chkRSS.selected;
-				userPrefs.subscribeEmail = chkEmail.selected;
-				userPrefs.storeAlerts = chkStoreAlerts.selected;
+			// When the user is set we want to set the combobox to have the correct state in it
+			[Bindable] public function set userPrefs(value:User):void
+			{
+				_userPrefs = value;
 				
-				//TODO: Save more user preferences here.
-				sharedObj = SharedObject.getLocal("User");
-				sharedObj.data.User = userPrefs;
-				sharedObj.data.firstrun = "done";
-				sharedObj.flush();
-				
+				if(cmbStates != null)
+				{
+					setProvince();
+				}
 			}
 			
-			private function finish1():void{
-				//Check that all required fields are filled.
-				if(!isValid_Email(txtEmail.text))
-					Alert.show("Please enter an valid email address.", "Error!");
-				else if(!isValid_ZIPCode(txtZip.text))
-					Alert.show("Please enter a valid ZIP Code.", "Error!");
-				else if(!isValid_Phone(txtCell.text))
-					Alert.show("Please enter a valid cell phone or other number capable of receiving SMS.", "Error!");
-				else
-					this.currentState="fr2";
+			public function get userPrefs():User
+			{
+				return _userPrefs;	
+			}
+			
+			// Sets the state combobox dependent on the user's state that was entered before
+			private function setProvince():void
+			{
+				if(userPrefs != null)
+				{
+					for(var i:int=0; i<provinces.US.length;i++)
+					{
+						if(provinces.US[i].abbr == userPrefs.province)
+						{
+							cmbStates.selectedIndex = i;
+							return;
+						}
+					}
+				}
+			}
+			
+			private function finish1():void {
+				userPrefs.province = cmbStates.selectedItem.abbr;
+				this.currentState='fr2';
 			}
 			
 			private function finish2():void{
-				this.currentState = "fr3";
+				var canChangeState:Boolean = true;
+				
+				if(chkEmail.selected)
+				{
+					if(!cmpEmail.isValid || cmpEmail.textInput.text == "")
+					{
+						lblEmailError.visible = true;
+						canChangeState = false;
+					}
+					else
+						lblEmailError.visible = false;
+				}
+				
+				if(chkSMS.selected)
+				{
+					if(!cmpCell.isValid || cmpCell.textInput.text == "")
+					{
+						lblPhoneError.visible = true;
+						canChangeState = false;
+					}
+					else
+						lblPhoneError.visible = false;
+				}
+				
+				if(canChangeState)
+				{
+					userPrefs.subscribeSMS = chkSMS.selected;
+					if(userPrefs.subscribeSMS)
+						userPrefs.cellNumber = cmpCell.textInput.text;
+					
+					userPrefs.subscribeEmail = chkEmail.selected;
+					if(userPrefs.subscribeEmail)
+						userPrefs.email = cmpEmail.textInput.text;
+					
+					this.currentState = "fr3";
+				}
 			}
 			
-			private function finish3():void{
-				saveAllFields();
-				
-				var event:Event = new Event("finishSetup");
-				dispatchEvent(event);
+			private function finish3():void {
+				userPrefs.firstRunCompleted = true;
+				dispatchEvent(new Event('saveUser'));
+				dispatchEvent(new Event("finishSetup"));
 			}
+			
+			private function chkSMS_Checked():void
+			{
+				cmpCell.enabled=chkSMS.selected;
+				if(!chkSMS.selected)
+					lblPhoneError.visible = false;
+			}
+			
+			private function chkEmail_Checked():void
+			{
+				cmpEmail.enabled=chkEmail.selected;
+				if(!chkEmail.selected)
+					lblEmailError.visible = false;
+			}
+			
 		]]>
 	</fx:Script>
 	<s:states>
@@ -85,39 +121,63 @@
 		<s:State name="fr2"/>
 		<s:State name="fr3"/>
 	</s:states>
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
 	
+	<fx:Declarations>
+		<lookups:Provinces id="provinces"/>
+	</fx:Declarations>
 	<!-- fr1 -->
-	<s:Label includeIn="fr1" x="10" y="10" text="Amber Alert Setup" fontSize="32" />
-	<s:Label includeIn="fr1" x="10" y="49" text="Step 1 - Personalize" fontSize="24" />
-	<s:Label includeIn="fr1" x="44" y="90" text="*Email:" />
-	<s:TextInput includeIn="fr1" x="92" y="80" id="txtEmail" />
-	<s:Label includeIn="fr1" x="10" y="120" text="Cell Number:" />
-	<s:TextInput includeIn="fr1" x="92" y="110" id="txtCell" />
-	<s:Label includeIn="fr1" x="73" y="150" text="*ZIP Code:" />
-	<s:TextInput includeIn="fr1" x="140" y="140" id="txtZip" width="80" textAlign="center" />
-	<s:Label includeIn="fr1" x="228" y="140" text="Enter the ZIP Code of the area for which you would like to receive alerts, or leave it blank to receive all alerts." lineBreak="toFit" width="212" />
-	<s:Button includeIn="fr1" x="10" y="219" label="Cancel" id="fr1_btnCancel" click="dispatchEvent(new Event('closeSetup'))" />
-	<s:Button includeIn="fr1" x="292" y="219" label="Back" enabled="false" id="fr1_btnBack" />
-	<s:Button includeIn="fr1" x="370" y="219" label="Next" id="fr1_btnNext" click="finish1()"/>
+	<s:VGroup includeIn="fr1" height="100%" width="100%" paddingTop="5" paddingLeft="5" paddingBottom="5" paddingRight="5">
+		<s:Label text="Amber Alert Setup" fontSize="32" />
+		<s:Label text="Step 1 - Personalize" fontSize="24" />
+		<s:Label text="Select a state if you want to receive{'\n'}alerts for that state only." />
+		<s:HGroup verticalAlign="middle">
+			<s:Label text="Select a state:" />
+			<mx:ComboBox id="cmbStates" dataProvider="{provinces.US}" labelField="name" prompt="Select a State" selectedIndex="0" />
+		</s:HGroup>
+		<mx:Spacer height="100%" />
+		<s:HGroup width="100%">
+			<s:Button label="Cancel" id="fr1_btnCancel" click="dispatchEvent(new Event('closeSetup'))" />
+			<mx:Spacer width="100%" />
+			<s:Button label="Back" enabled="false" id="fr1_btnBack" />
+			<s:Button label="Next" id="fr1_btnNext" click="finish1()"/>
+		</s:HGroup>
+	</s:VGroup>
 	
 	<!-- fr2 -->
-	<s:Label includeIn="fr2" x="10" y="10" text="Amber Alert Setup" fontSize="32" />
-	<s:Label includeIn="fr2" x="10" y="49" text="Step 2 - Subscriptions" fontSize="24" />
-	<s:CheckBox includeIn="fr2" id="chkEmail"  x="10" y="80" width="70" label="Email" selected="true" />
-	<s:CheckBox includeIn="fr2" x="10" y="106" label="Text Messaging" id="chkSMS" selected="false" />
-	<s:CheckBox includeIn="fr2" x="10" y="132" label="RSS Feed" id="chkRSS" selected="false" />
-	<s:Button includeIn="fr2" x="10" y="219" label="Cancel" id="fr2_btnCancel" click="dispatchEvent(new Event('closeSetup'))" />
-	<s:Button includeIn="fr2" x="292" y="219" label="Back" id="fr2_btnBack" click="this.currentState='fr1'" />
-	<s:Button includeIn="fr2" x="370" y="219" label="Next" click="finish2()" id="fr2_btnNext" />
+	<s:VGroup includeIn="fr2" height="100%" width="100%" paddingTop="5" paddingLeft="5" paddingBottom="5" paddingRight="5">
+		<s:Label text="Amber Alert Setup" fontSize="32" />
+		<s:Label text="Step 2 - Subscriptions" fontSize="24" />
+		<s:Label text="Select the service from which you want{'\n'}to subscribe to receive alerts in real time." />
+		<s:HGroup verticalAlign="middle">
+			<s:CheckBox label="Email:" id="chkEmail" selected="{userPrefs.subscribeEmail}" change="{chkEmail_Checked();}" />
+			<components:EmailTextinput id="cmpEmail" required="{chkEmail.selected}" enabled="{chkEmail.selected}" text="{userPrefs.email}"/>
+			<s:Label id="lblEmailError" text="*required" color="0xFF0000" visible="false" />
+		</s:HGroup>
+		<s:HGroup>
+			<s:CheckBox label="Text Messaging:" id="chkSMS" selected="{userPrefs.subscribeSMS}" change="{chkSMS_Checked();}" />
+			<components:PhoneTextinput id="cmpCell" required="{chkSMS.selected}" enabled="{chkSMS.selected}" text="{userPrefs.cellNumber}"/>
+			<s:Label id="lblPhoneError" text="*required" color="0xFF0000" visible="false" />
+		</s:HGroup>
+		<mx:Spacer height="100%"/>
+		<s:HGroup width="100%">
+			<s:Button label="Cancel" id="fr2_btnCancel" click="dispatchEvent(new Event('closeSetup'))" />
+			<mx:Spacer width="100%" />
+			<s:Button label="Back" id="fr2_btnBack" click="this.currentState='fr1'" />
+			<s:Button label="Next" click="finish2()" id="fr2_btnNext" />
+		</s:HGroup>
+	</s:VGroup>
 	
 	<!-- fr3 -->
-	<s:Label includeIn="fr3" x="10" y="10" text="Amber Alert Setup" fontSize="32"/>
-	<s:Label includeIn="fr3" x="10" y="49" text="Step 3 - Misc. Options" fontSize="24"/>
-	<s:CheckBox includeIn="fr3" x="10" y="80" label="Store Alerts" id="chkStoreAlerts" selected="true" />
-	<s:Button includeIn="fr3" x="10" y="219" label="Cancel" id="fr3_btnCancel" click="dispatchEvent(new Event('closeSetup'))" />
-	<s:Button includeIn="fr3" x="292" y="219" label="Back" id="fr3_btnBack" click="this.currentState='fr2'" />
-	<s:Button includeIn="fr3" x="370" y="219" label="Finish!" id="fr3_btnNext" click="finish3()"/>
+	<s:VGroup includeIn="fr3" width="100%" height="100%" paddingTop="5" paddingLeft="5" paddingBottom="5" paddingRight="5">
+		<s:Label text="Amber Alert Setup" fontSize="32"/>
+		<s:Label text="Setup Complete!" fontSize="24"/>
+		<s:Label text="Congratulations, you've completed setup!{'\n'}Click 'Finish' to run the Amber Alert Desktop Notifier." />
+		<mx:Spacer height="100%" />
+		<s:HGroup width="100%">
+			<s:Button label="Cancel" id="fr3_btnCancel" click="dispatchEvent(new Event('closeSetup'))" />
+			<mx:Spacer width="100%"/>
+			<s:Button label="Back" id="fr3_btnBack" click="this.currentState='fr2'" />
+			<s:Button label="Finish!" id="fr3_btnNext" click="finish3()"/>
+		</s:HGroup>
+	</s:VGroup>
 </s:Group>

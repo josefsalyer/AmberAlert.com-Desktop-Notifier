@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <application xmlns="http://ns.adobe.com/air/application/1.5.2">
 
 <!-- Adobe AIR Application Descriptor File Template.
@@ -11,10 +11,11 @@
 			
 	minimumPatchLevel - The minimum patch level of the AIR runtime required to run 
 			the application. Optional.
+
 -->
 
 	<!-- The application identifier string, unique to this application. Required. -->
-	<id>desktopnotifier</id>
+	<id>com.amberalert.desktop</id>
 
 	<!-- Used as the filename for the application. Required. -->
 	<filename>AmberAlerter</filename>
@@ -61,7 +62,7 @@
 		<resizable>true</resizable>
 
 		<!-- The window's initial width. Optional. -->
-		<!-- <width></width> -->
+		<!-- <width>600</width>-->
 
 		<!-- The window's initial height. Optional. -->
 		<!-- <height></height> -->

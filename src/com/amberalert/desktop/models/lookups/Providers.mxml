@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ArrayCollection xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/halo">
+	<fx:Array id="providers">
+		<fx:Object data="teleflip.com" label=" Teleflip"/>
+		<fx:Object data="message.alltel.com" label="Alltel"/>
+		<fx:Object data="paging.acswireless.com" label="Ameritech"/>
+		<fx:Object data="txt.att.net" label="ATT Wireless"/>
+		<fx:Object data="bellsouth.cl" label="Bellsouth"/>
+		<fx:Object data="myboostmobile.com" label="Boost"/>
+		<fx:Object data="mobile.celloneusa.com" label="CellularOne"/>
+		<fx:Object data="mms.uscc.net" label="CellularOne MMS"/>
+		<fx:Object data="mobile.mycingular.com" label="Cingular"/>
+		<fx:Object data="sms.edgewireless.com" label="Edge Wireless"/>
+		<fx:Object data="messaging.sprintpcs.com" label="Sprint PCS"/>
+		<fx:Object data="tmomail.net" label="T-Mobile"/>
+		<fx:Object data="mymetropcs.com" label="Metro PCS"/>
+		<fx:Object data="messaging.nextel.com" label="Nextel"/>
+		<fx:Object data="mobile.celloneusa.com" label="O2"/>
+		<fx:Object data="mobile.celloneusa.com" label="Orange"/>
+		<fx:Object data="qwestmp.com" label="Qwest"/>
+		<fx:Object data="pcs.rogers.com" label="Rogers Wireless"/>
+		<fx:Object data="msg.telus.com" label="Telus Mobility"/>
+		<fx:Object data="email.uscc.net" label="US Cellular"/>
+		<fx:Object data="vtext.com" label="Verizon"/>
+		<fx:Object data="vmobl.com" label="Virgin Mobile"/>
+	</fx:Array>
+</s:ArrayCollection>

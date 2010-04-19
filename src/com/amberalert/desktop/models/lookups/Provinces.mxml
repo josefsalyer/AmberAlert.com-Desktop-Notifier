@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ArrayCollection xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/halo"
+				   xmlns:app="com.amberalert.desktop.models.app.*">
+	<fx:Array id="US">
+		<fx:Object name="All AmberAlerts" abbr="XX"/>
+		<fx:Object name="Alabama" abbr="AL"/>
+		<fx:Object name="Alaska" abbr="AK"/>
+		<fx:Object name="Arizona" abbr="AZ"/>
+		<fx:Object name="Arkansas" abbr="AR"/>
+		<fx:Object name="California" abbr="CA"/>
+		<fx:Object name="Colorado" abbr="CO"/>
+		<fx:Object name="Connecticut" abbr="CT"/>
+		<fx:Object name="Delaware" abbr="DE"/>
+		<fx:Object name="Washington DC" abbr="DC"/>
+		<fx:Object name="Florida" abbr="FL"/>
+		<fx:Object name="Georgia" abbr="GA"/>
+		<fx:Object name="Hawaii" abbr="HI"/>
+		<fx:Object name="Idaho" abbr="ID"/>
+		<fx:Object name="Illinois" abbr="IL"/>
+		<fx:Object name="Indiana" abbr="IN"/>
+		<fx:Object name="Iowa" abbr="IA"/>
+		<fx:Object name="Kansas" abbr="KS"/>
+		<fx:Object name="Kentucky" abbr="KY"/>
+		<fx:Object name="Louisiana" abbr="LA"/>
+		<fx:Object name="Maine" abbr="ME"/>
+		<fx:Object name="Maryland" abbr="MD"/>
+		<fx:Object name="Massachusetts" abbr="MA"/>
+		<fx:Object name="Michigan" abbr="MI"/>
+		<fx:Object name="Minnesota" abbr="MN"/>
+		<fx:Object name="Mississippi" abbr="MS"/>
+		<fx:Object name="Missouri" abbr="MO"/>
+		<fx:Object name="Montana" abbr="MT"/>
+		<fx:Object name="Nebraska" abbr="NE"/>
+		<fx:Object name="Nevada" abbr="NV"/>
+		<fx:Object name="New Hampshire" abbr="NH"/>
+		<fx:Object name="New Jersey" abbr="NJ"/>
+		<fx:Object name="New Mexico" abbr="NM"/>
+		<fx:Object name="New York" abbr="NY"/>
+		<fx:Object name="North Carolina" abbr="NC"/>
+		<fx:Object name="North Dakota" abbr="ND"/>
+		<fx:Object name="Ohio" abbr="OH"/>
+		<fx:Object name="Oklahoma" abbr="OK"/>
+		<fx:Object name="Oregon" abbr="OR"/>
+		<fx:Object name="Pennsylvania" abbr="PA"/>
+		<fx:Object name="Rhode Island" abbr="RI"/>
+		<fx:Object name="South Carolina" abbr="SC"/>
+		<fx:Object name="South Dakota" abbr="SD"/>
+		<fx:Object name="Tennessee" abbr="TN"/>
+		<fx:Object name="Texas" abbr="TX"/>
+		<fx:Object name="Utah" abbr="UT"/>
+		<fx:Object name="Vermont" abbr="VT"/>
+		<fx:Object name="Virginia" abbr="VA"/>
+		<fx:Object name="Washington" abbr="WA"/>
+		<fx:Object name="West Virginia" abbr="WV"/>
+		<fx:Object name="Wisconsin" abbr="WI"/>
+		<fx:Object name="Wyoming" abbr="WY"/>
+	</fx:Array>
+</s:ArrayCollection>
+

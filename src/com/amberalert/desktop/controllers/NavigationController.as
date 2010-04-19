@@ -22,6 +22,14 @@ package com.amberalert.desktop.controllers
 	import mx.controls.Alert;
 	import mx.events.CloseEvent;
 	
+	/**
+	 * NavigationController
+	 * 
+	 * Class that manages all the different states of the program.
+	 * 
+	 * @param var currentState:String
+	 * @author ASU Amber Alert Team
+	 **/
 	[Bindable]
 	public class NavigationController extends EventDispatcher
 	{
@@ -30,21 +38,57 @@ package com.amberalert.desktop.controllers
 		public var stage:Stage;
 		public var alertExists:Boolean;
 		
+		/**
+		 * setCurrentView
+		 * 
+		 * Function that changes the current state of the program to the
+		 * inputted string.
+		 * 
+		 * @param var currentState:String
+		 **/
 		public function setCurrentView(destination:String):void
 		{
 			currentState = destination;
 		}
 		
-		//This sets the stage in which it is coming from the view, it also loads the system tray icon/dock icon
-		public function loadNav(value:Stage):void
+		/**
+		 * loadNav
+		 * 
+		 * Function that sets the stage in which it is coming from the 
+		 * view, it also loads the system tray icon/dock icon.
+		 * 
+		 * @param var stage:Stage
+		 **/
+		public function loadNav(mainStage:Stage):void
 		{
-			stage = value;
-			
+			stage = mainStage;
 			//Load system tray icon / dock icon.
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, prepareForSystray);
 			try {loader.load(new URLRequest("/assets/icons/aa16.png"));}
 			catch(error:Error){trace("Unable to load icon.");}
+		}
+		
+		/**
+		 * prepareForSystray
+		 * 
+		 * Function that loads Systray icon, sets the icon on the Systray.
+		 * 
+		 * @param var dockImage:BitmapData
+		 **/
+		public function resizeAndMoveWindow(width:Number=-100000,height:Number=-100000,x:Number=-100000,y:Number=-100000):void
+		{
+			if(width != -100000)
+				NativeApplication.nativeApplication.activeWindow.width = width;	
+			
+			if(height != -100000)
+				NativeApplication.nativeApplication.activeWindow.height = height;
+			
+			if(x != -100000)
+				NativeApplication.nativeApplication.activeWindow.x = x;
+				
+			if(y != -100000)
+				NativeApplication.nativeApplication.activeWindow.y = y;
 		}
 		
 		private function prepareForSystray(event:Event):void 
@@ -55,19 +99,38 @@ package com.amberalert.desktop.controllers
 			
 			if(NativeApplication.supportsDockIcon) //Mac
 			{
-				var dockIcon: DockIcon = NativeApplication.nativeApplication.icon as DockIcon;
+				//var dockIcon: DockIcon = NativeApplication.nativeApplication.icon as DockIcon;
 				NativeApplication.nativeApplication.addEventListener(InvokeEvent.INVOKE, trayIcon_click);
-				dockIcon.menu = createIconMenu();
+				//dockIcon.menu = createIconMenu();
 			}
 			else if (NativeApplication.supportsSystemTrayIcon) //Windows
 			{
 				SystemTrayIcon(NativeApplication.nativeApplication.icon).tooltip = "AMBERAlert.com";
 				SystemTrayIcon(NativeApplication.nativeApplication.icon).addEventListener(MouseEvent.CLICK, trayIcon_click);
 				stage.nativeWindow.addEventListener(NativeWindowDisplayStateEvent.DISPLAY_STATE_CHANGING, windowMinimized);
+				//SystemTrayIcon(NativeApplication.nativeApplication.icon).menu = createIconMenu();
+			}
+		}
+		
+		public function prepareMenu():void
+		{
+			if(NativeApplication.supportsDockIcon) //Mac
+			{
+				var dockIcon: DockIcon = NativeApplication.nativeApplication.icon as DockIcon;
+				dockIcon.menu = createIconMenu();
+			}
+			else if (NativeApplication.supportsSystemTrayIcon) //Windows
+			{
 				SystemTrayIcon(NativeApplication.nativeApplication.icon).menu = createIconMenu();
 			}
 		}
 		
+		/**
+		 * trayIcon_click
+		 * 
+		 * Function that handles the proper events once the tray icon
+		 * is clicked.
+		 **/
 		private function trayIcon_click(evt:Event):void 
 		{
 			if(currentState != Destinations.FIRST_RUN) 
@@ -82,12 +145,17 @@ package com.amberalert.desktop.controllers
 					
 				else
 				{
-					stage.nativeWindow.visible = true;
-					stage.nativeWindow.orderToFront();
+					bringWindowToFront();
 				}
 			}
 		}
 		
+		/**
+		 * windowMinimized
+		 * 
+		 * Function that controls the events once the desktop notifier window
+		 * gets minimized.
+		 **/
 		private function windowMinimized(displayStateEvent:NativeWindowDisplayStateEvent):void 
 		{
 			if(displayStateEvent.afterDisplayState == NativeWindowDisplayState.MINIMIZED)
@@ -97,6 +165,12 @@ package com.amberalert.desktop.controllers
 			}
 		}
 		
+		/**
+		 * createIconMenu
+		 * 
+		 * Creates the menu that's displayed and accesed from the system tray. As well
+		 * as creates the event handelers for each menu item.
+		 **/
 		private function createIconMenu():NativeMenu
 		{
 			var cmdActiveAlerts: NativeMenuItem = new NativeMenuItem("Active Alerts");
@@ -124,12 +198,17 @@ package com.amberalert.desktop.controllers
 			return menu;
 		}
 		
+		/**
+		 * showAlerts
+		 * 
+		 * Function that changes to the alert notification state and view which
+		 * displays any active Amber Alerts in a given state
+		 **/
 		public function showAlerts(event:Event = null):void 
 		{
 			//TODO: Slide up the alert notification. Make it work.
 			currentState = Destinations.NOTIFICATION;
-			stage.nativeWindow.visible = true;
-			stage.nativeWindow.orderToFront();
+			bringWindowToFront();
 			notify();
 			
 			/*var n: NativeWindowInitOptions = new NativeWindowInitOptions();
@@ -144,30 +223,63 @@ package com.amberalert.desktop.controllers
 			//Set timer to close notification window
 		}
 		
+		/**
+		 * showSafetyTips
+		 * 
+		 * Function that switches the current state and view to display child
+		 * safety tips acquired from the web.
+		 **/
 		public function showSafetyTips(event:Event = null):void 
 		{
 			currentState = Destinations.SAFETY_TIPS;
-			stage.nativeWindow.visible = true;
-			stage.nativeWindow.orderToFront();
+			bringWindowToFront();
 		}
 		
+		/**
+		 * showSettings
+		 * 
+		 * Function that switches the current state and view to display the
+		 * settings. Also from which they can be changed.
+		 **/
 		public function showSettings(event:Event = null):void 
 		{
 			currentState = Destinations.SETTINGS;
-			stage.nativeWindow.visible = true;
-			stage.nativeWindow.orderToFront();
+			bringWindowToFront();
 		}
 		
+		/**
+		 * showAbout
+		 * 
+		 * Function that switches the current state and view to the "about"
+		 * information.
+		 **/
 		public function showAbout(event:Event = null):void 
 		{
 			currentState = Destinations.ABOUT;
-			stage.nativeWindow.visible = true;
-			stage.nativeWindow.orderToFront();
+			bringWindowToFront();
 		}
 		
+		/**
+		 * closeFromIcon
+		 * 
+		 * Function that quits the application by exiting from the system
+		 * tray.
+		 **/
 		public function closeFromIcon(event:Event = null):void
 		{
 			stage.nativeWindow.close();
+		}
+		
+		/**
+		 * notify
+		 * 
+		 * Function that notifies the user of an event through the syetem
+		 * tray icon.
+		 **/
+		public function bringWindowToFront():void
+		{
+			stage.nativeWindow.visible = true;
+			stage.nativeWindow.orderToFront();
 		}
 		
 		private function notify():void
@@ -185,6 +297,12 @@ package com.amberalert.desktop.controllers
 		//TODO: For some reason, closing with Alt-F4 sometimes makes
 		//the system tray icon disappear but the application continues
 		//running invisibly. Make it work.
+		/**
+		 * closeSetupWarning
+		 * 
+		 * Function that displays an "are you sure" message when closing during
+		 * the setup wizard.
+		 **/
 		public function closeSetupWarning():void
 		{
 			if(currentState == Destinations.FIRST_RUN)
@@ -195,12 +313,22 @@ package com.amberalert.desktop.controllers
 				dock();
 		}
 		
+		/**
+		 * dock
+		 *
+		 * Minimize the program to the system dock
+		 **/
 		private function dock():void 
 		{
 			currentState = Destinations.DOCKED;
 			stage.nativeWindow.visible = false;
 		}
 		
+		/**
+		 * closingFromSetup
+		 *
+		 * Event handler for when a user exits from first-run
+		 **/
 		private function closingFromSetup(eventObj:CloseEvent):void 
 		{
 			if (eventObj.detail==Alert.YES)

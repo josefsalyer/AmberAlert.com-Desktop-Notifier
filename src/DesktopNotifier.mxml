@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--- 
-The class level comment for the component. 
-This tag supports all ASDoc tags, 
-and does not require a CDATA block.
-
-@see spark.components.WindowedApplication
--->
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					   xmlns:s="library://ns.adobe.com/flex/spark" 
-					   xmlns:mx="library://ns.adobe.com/flex/halo" width="450" height="250"
-					   xmlns:views="com.amberalert.desktop.views.*" 
-					   xmlns:models="com.amberalert.desktop.models.*" 
-					   xmlns:local="*" 
-					   xmlns:controllers="com.amberalert.desktop.controllers.*"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:views="com.amberalert.desktop.views.*" xmlns:models="com.amberalert.desktop.models.*" xmlns:local="*" xmlns:controllers="com.amberalert.desktop.controllers.*"
 					   closing="mainview.closeMe(event)" showStatusBar="false" >
 
 	<fx:Declarations>

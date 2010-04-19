@@ -16,8 +16,7 @@
 			
 			public function onLoad():void 
 			{
-				dispatchEvent(new Event('initialLoad'));	
-				
+				dispatchEvent(new Event('initialLoad'));
 			}
 			
 			public function set alertExists(value:Boolean):void
@@ -55,24 +54,22 @@
 		<s:State name="safetytips"/>
 		<s:State name="settings"/>
 		<s:State name="about"/>
+		<!--
+		Waiting for merge of list view by Tom
+		<s:State name="listview"/>
+		-->
 	</s:states>
 	<fx:Declarations>
 		<models:User id="user" />
 	</fx:Declarations>
-	<views:FirstRunView id="fr" includeInLayout="false" closeSetup="closeMe(event)" finishSetup="setupComplete()" includeIn="firstrun"/>
+	
+	<views:FirstRunView id="fr" closeSetup="closeMe(event)" finishSetup="setupComplete()" includeIn="firstrun"/>
 	<views:NotificationView id="notification" includeIn="notification" />
 	<views:SafetyTipsView id="safetytips" includeIn="safetytips"/>
-	<views:SettingsView id="settings" includeIn="settings"/>
+	<views:SettingsView id="settings" includeIn="settings" cancelSetting="closeMe(event)"/>
+	<!--
+	waiting for merge of list view by Tom
+	<views:ListView id="listview" includeIn="listview"/>
+	-->
 	<s:Label includeIn="about" x="178" y="41" text="About us..."/>
-	<!--<s:HGroup>
-		
-		<s:Button label="first run" click="navigateTo(Destinations.FIRST_RUN)" />
-		<s:Button label="docked" click="navigateTo(Destinations.DOCKED)" />
-		<s:Button label="notification" click="navigateTo(Destinations.NOTIFICATION)" />
-		<s:Button label="safety tips" click="navigateTo(Destinations.SAFETY_TIPS)" />
-		<s:Button label="settings" click="navigateTo(Destinations.SETTINGS)" />
-		<s:Button label="about" click="navigateTo(Destinations.ABOUT)" />	
-	</s:HGroup>-->
-	
-
 </s:Group>

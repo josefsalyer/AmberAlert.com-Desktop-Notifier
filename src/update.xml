@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<update xmlns="http://ns.adobe.com/air/framework/update/description/1.0">
+
+	<version>v1.0</version>
+	<url>http://ADDRESS-TO-PROJECT!!!!</url>
+
+	<description><![CDATA[
+		v1.0
+		* First Full Program Release.
+		* Displays Active Amber Alerts
+		* Allows Users to Subscribe to Alerts
+	]]></description>
+</update>

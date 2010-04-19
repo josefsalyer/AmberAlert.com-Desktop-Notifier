@@ -1,7 +1,8 @@
 package com.amberalert.desktop.models
 {
 	import mx.collections.ArrayCollection;
-
+	
+	[Bindable]
 	public class AMBERAlert
 	{
 		public var uid:String;
@@ -11,5 +12,6 @@ package com.amberalert.desktop.models
 		public var suspects:ArrayCollection = null;
 		public var vehicles:ArrayCollection = null;
 		public var locations:ArrayCollection = null;
+		public var description:String;
 	}
 }

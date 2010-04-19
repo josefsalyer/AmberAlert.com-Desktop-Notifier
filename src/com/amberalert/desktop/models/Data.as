@@ -4,5 +4,6 @@ package com.amberalert.desktop.models
 	{
 		public var issuedDate:String;
 		public var phone:String;
+		public var description:String;
 	}
 }

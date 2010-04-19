@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GlueMap xmlns="http://glue.seanhess.net/2009"
+<GlueMap xmlns="net.seanhess.glue.tags.*"
 		 xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/halo"
@@ -10,12 +10,13 @@
 		]]>
 	</fx:Script>
 	
-	
+	<controllers:ConnectionChecker internetStatusChange="internetChange.execute()"/>
 	<controllers:ApplicationController id="app" alertExists="{alerts.alertExists}" setToFirstRun="nav.setCurrentView(Destinations.FIRST_RUN)"
-									   setToNotification="nav.setCurrentView(Destinations.NOTIFICATION)" setToSafety="nav.setCurrentView(Destinations.SAFETY_TIPS)"/>
+									   setToNotification="nav.showAlerts()" setToSafety="nav.setCurrentView(Destinations.SAFETY_TIPS)" 
+									   loadSystemTray="nav.prepareMenu()"/>
 	<controllers:FirstRunApplicationController id="frapp" />
 	<views:MainView id="mainview" />
-	<controllers:AlertController id="alerts"/>
+	<controllers:AlertController id="alerts" currentLoc="{app.userPrefs.province}" currentState="{nav.currentState}" showNotification="nav.showAlerts()"/>
 	<controllers:SafetyTipController id="safetytips"/>
 	
 	<controllers:NavigationController id="nav" alertExists="{alerts.alertExists}"/>
@@ -23,6 +24,11 @@
 	<Command id="init" stage="none">
 		<Action call="nav.loadNav(scope.stage)"/>
 		<Action call="app.grabUserObject()"/>
+	</Command>
+	
+	<Command id="internetChange">
+		<Action call="safetytips.grabSafetyTips()"/>
+		<Action call="alerts.pullAlerts()"/>
 	</Command>
 	
 	<Glue match="DesktopNotifier">
@@ -43,12 +49,26 @@
 		<Route event="{Destinations.SETTINGS}" call="{nav.setCurrentView(Destinations.SETTINGS)}" />
 	</Glue>
 	
+	<Glue match="FirstRunView">
+		<Inject userPrefs="{app.userPrefs}"/>
+		<Route event="saveUser" call="app.saveUserPrefs(view.userPrefs)"/>
+	</Glue>
+	
 	<Glue match="SafetyTipsView">
 		<Inject currentSafetyTip="{safetytips.currentTip}"/>
 	</Glue>
 	
 	<Glue match="NotificationView">
 		<Inject currentAlert="{alerts.currentAlert}"/>
+		<Inject alertExists="{alerts.alertExists}"/>
+		<Route event="nextAlert" call="alerts.nextAlert()"/>
+		<Route event="prevAlert" call="alerts.prevAlert()"/>
+		<Route event="listView" call="{nav.setCurrentView(Destinations.SAFETY_TIPS)}"/> 
+	</Glue>
+	
+	<Glue match="SettingsView">
+		<Inject userPrefs="{app.userPrefs}"/>
+		<Route event="saveUser" call="app.saveUserPrefs(view.userPrefs)"/>
 	</Glue>
 	
 </GlueMap>
