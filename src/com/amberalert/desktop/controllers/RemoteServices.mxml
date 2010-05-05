@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fx:Object xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Script>
+		<![CDATA[
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.Base64Encoder;
+			protected function resultHandler(event:ResultEvent):void
+			{
+				trace(event.result);
+			}
+			
+			
+			protected function faultHandler(event:FaultEvent):void
+			{
+				trace(event.fault);
+			}
+			
+			
+			public function emailSignupHandler(addy:String, province:String):void
+			{
+				var params:Object = new Object();
+				params.state = province; //replace this with the selected value
+				params.email = addy;
+				process(email, params);
+			}
+			
+			
+			public function smsSignupHandler(number:String, provider:String, province:String):void
+			{
+				//please make sure to validate all data before sending to the server
+				var params:Object = new Object();
+				params.state = province; //replace this with the selected value
+				
+				params.phone = "1" + PhoneFormatter.strip(number) + "@" + provider; //grab the selected provider and concatenate it to the number and +1 to support 
+				process(sms, params);
+			}
+			
+			public function verifyHandler(token:String):void
+			{
+				var params:Object = {key:'value'};
+				verify.url = 'https://mm-dev.amberalert.com/verify/' + token ;
+				process(verify, params);
+			}
+			
+			protected function process(service:HTTPService, params:Object):void
+			{
+				
+				var encoder:Base64Encoder = new Base64Encoder();
+				encoder.insertNewLines = false; // needed so it doesn't blow up
+				encoder.encode(api.username + ":" + api.password);
+				var auth:String = encoder.toString()
+				
+				service.headers = {Authorization:"Basic " + auth};  
+				service.send(params);
+				
+			}
+			
+			//I put these here for visibility's sake.  please remove before pushing to git hub
+			//To get your own api key, please email sysops+api@amberalert.com
+			[Bindable]
+			protected var api:Object = {username:'',password:''};
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:HTTPService id="email" url="https://mm-dev.amberalert.com/email" method="POST" useProxy="false" result="resultHandler(event)" fault="faultHandler(event)"  />
+		<s:HTTPService id="sms" url="https://mm-dev.amberalert.com/sms" method="POST" useProxy="false" result="resultHandler(event)" fault="faultHandler(event)" />
+		<s:HTTPService id="verify" url="https://mm-dev.amberalert.com/verify/" method="GET" useProxy="false" result="resultHandler(event)" fault="faultHandler(event)" />
+	</fx:Declarations>
+</fx:Object>

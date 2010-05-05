@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" 
+    xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	alpha.disabled="0.5" creationComplete="init()" xmlns:lookups="com.amberalert.desktop.models.lookups.*">
+    <fx:Metadata>
+    <![CDATA[ 
+        /** 
+         * @copy spark.skins.spark.ApplicationSkin#hostComponent
+         */
+        [HostComponent("spark.components.SkinnableContainer")]
+    ]]>
+    </fx:Metadata> 
+    
+	<fx:Script>
+		<![CDATA[
+			import com.amberalert.desktop.models.Destinations;
+			
+			import mx.managers.CursorManager;
+			import mx.managers.DragManager;
+			
+			[Bindable] public var alertNum		:	int;
+			[Bindable] public var canSeeAlert	:	Boolean;
+			[Bindable] private var _mainState	:	String;
+			[Bindable] private var titleStr		:	String;
+			[Bindable] private var _province	:	String;
+			private var timer:Timer;
+			
+			public function set mainState(value:String):void
+			{
+				_mainState = value;
+				prov.visible = false;
+				
+				switch(value)
+				{
+					case Destinations.FIRST_RUN:
+						titleStr = 'Setup';
+						break;
+					case Destinations.ABOUT:
+						titleStr = 'About Us';
+						break;
+					case Destinations.NOTIFICATION:
+						prov.visible = true;
+						titleStr = 'Showing All Amber Alerts from ';
+						break;
+					case Destinations.SAFETY_TIPS:
+						titleStr = 'Child Safety Tips';
+						break;
+					case Destinations.SETTINGS:
+						titleStr = 'Settings';
+						break;
+				}
+			}
+			
+			public function set province(value:String):void
+			{
+				for each(var prov:Object in provinces.US)
+				{
+					if(prov.abbr == value)
+					{
+						_province = prov.name;
+						break;
+					}
+				}
+			}
+			
+			private function init():void {
+				timer = new Timer(1000);
+				timer.addEventListener(TimerEvent.TIMER, resetNow);
+				timer.start();
+				var dateObj:Array = new Date().toLocaleDateString().split(' ');
+				date.text = dateObj[1] + ' ' + dateObj[2] + ',' + dateObj[3];
+				
+			}
+			
+			private function resetNow(event:TimerEvent):void {
+				clock.text = new Date().toLocaleTimeString();
+			}
+			
+			private function navtoBuyChildId():void
+			{
+				var req:URLRequest = new URLRequest('http://buymychildid.com');
+				navigateToURL(req, "_blank");
+			}
+			
+			private function onMouseDown(e:MouseEvent):void
+			{
+				stage.nativeWindow.startMove();
+				Mouse.cursor = MouseCursor.HAND;
+			}
+			
+			private function imgClick():void
+			{
+				var req:URLRequest = new URLRequest('http://amberalert.com');
+				navigateToURL(req, "_blank");
+			}				
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<lookups:Provinces id="provinces"/>
+	</fx:Declarations>
+	
+    <s:states>
+        <s:State name="normal" />
+        <s:State name="disabled" />
+    </s:states>
+	
+	<s:VGroup width="660" height="510" bottom="0" left="6" top="0" gap="0">
+		<mx:Spacer height="27"/>
+		<s:HGroup width="100%" height="55" verticalAlign="middle" mouseDown="onMouseDown(event)" mouseUp="Mouse.cursor = MouseCursor.AUTO">
+			<mx:Spacer width="10"/>
+			<mx:Image source="assets/images/amberLogo.png" click="imgClick()" useHandCursor="true" buttonMode="true"/>
+			<mx:Spacer width="100%"/>
+			<s:Label color="#d8d8d8" fontSize="20" text="Active Alerts:" paddingRight="60" paddingTop="15" visible="{_mainState == Destinations.NOTIFICATION &amp;&amp; alertNum > 0}"/>
+			<mx:Spacer width="35"/>
+		</s:HGroup>
+		
+		<mx:Spacer height="6"/>
+		<s:HGroup width="100%" height="44" verticalAlign="middle">
+			<s:Label paddingLeft="15" color="#636363" fontSize="18" fontWeight="bold" text="{titleStr}"/>
+			<s:Label id="prov" text=" {_province}" color="#636363" fontSize="18" fontWeight="bold"/>
+		</s:HGroup>
+		
+		<s:HGroup height="21" width="100%" visible="{_mainState == Destinations.NOTIFICATION &amp;&amp; alertNum > 0}" verticalAlign="middle">
+			<s:Label paddingLeft="60" text="Victim" color="#ffffff"/>
+			<!--<s:Label paddingLeft="40" text="Victims Name" color="#ffffff"/>-->
+			<s:Label paddingLeft="190" text="Description" color="#ffffff"/>
+			<s:Label paddingLeft="140" text="Share" color="#ffffff"/>
+		</s:HGroup>
+		
+		<s:Group width="100%" height="100%">
+			<!--- @copy spark.components.SkinnableContainer#contentGroup -->
+			<s:Group id="contentGroup" width="100%" top="15" bottom="10" left="15" right="55">
+				<s:layout>
+					<s:BasicLayout/>
+				</s:layout>
+			</s:Group>	
+		</s:Group>
+		<s:HGroup width="100%" height="28" verticalAlign="middle">
+			<s:Label paddingLeft="15" text="Keep your kids safe! Buy a My Child ID!" color="#ffffff"/>
+			<s:Label text="Buy Now!" textDecoration="underline" color="#77b931" useHandCursor="true" buttonMode="true" click="navtoBuyChildId()"/>
+			<mx:Spacer width="100%"/>
+			<s:Label id="date" color="#ffffff" paddingRight="5"/>
+			<s:Label id="clock" color="#ffffff" paddingRight="15"/>
+			<mx:Spacer width="25"/>
+		</s:HGroup>
+	</s:VGroup>
+	
+	<s:Group right="17" top="12" visible="{canSeeAlert &amp;&amp; _mainState == Destinations.NOTIFICATION}">
+		<mx:Image source="assets/images/alertNumCircle.png"/>
+		<s:VGroup horizontalAlign="center" width="100%" height="100%" horizontalCenter="-1">
+			<s:HGroup height="100%" verticalAlign="middle" verticalCenter="6">
+				<s:RichText color="0xFFFFFF" kerning="on" lineHeight="120%" whiteSpaceCollapse="preserve" id="richtext1">
+					<s:content><s:p whiteSpaceCollapse="collapse"><s:span fontSize="30"><s:text>{alertNum}</s:text></s:span></s:p></s:content>
+				</s:RichText>
+			</s:HGroup>	
+		</s:VGroup>
+	</s:Group>
+	
+	<s:Group top="15" left="-7">
+		<mx:Image source="assets/images/closeX.png" useHandCursor="true" buttonMode="true" click="dispatchEvent(new Event('closeWindow'))"/>
+	</s:Group>
+</s:Skin>

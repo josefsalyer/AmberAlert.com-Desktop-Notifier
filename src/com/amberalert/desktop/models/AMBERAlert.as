@@ -13,5 +13,10 @@ package com.amberalert.desktop.models
 		public var vehicles:ArrayCollection = null;
 		public var locations:ArrayCollection = null;
 		public var description:String;
+		
+		public function get url():String
+		{
+			return 'http://www.amberalert.com/alerts/' + uid;
+		}
 	}
 }

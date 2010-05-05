@@ -4,7 +4,7 @@
 				   xmlns:mx="library://ns.adobe.com/flex/halo"
 				   xmlns:app="com.amberalert.desktop.models.app.*">
 	<fx:Array id="US">
-		<fx:Object name="All AmberAlerts" abbr="XX"/>
+		<!--<fx:Object name="All AmberAlerts" abbr="XX"/>-->
 		<fx:Object name="Alabama" abbr="AL"/>
 		<fx:Object name="Alaska" abbr="AK"/>
 		<fx:Object name="Arizona" abbr="AZ"/>

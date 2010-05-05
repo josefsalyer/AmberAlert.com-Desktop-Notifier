@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+	<s:layout><s:VerticalLayout/></s:layout>
+	<fx:Metadata>
+		[Event(name="cancelSetting", type="flash.events.Event")]
+	</fx:Metadata>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			private function navtoSupport():void
+			{
+				var req:URLRequest = new URLRequest('http://www.amberalert.com/support/');
+				navigateToURL(req, "_blank");
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" gap="0">
+		<mx:Text width="100%" text="AmberAlert.com is a privately held technology company, providing solutions to improve the efficiency of issuing and responding to AMBER™ Alerts."/>
+		<mx:Text width="100%" text="We are a vehicle for the fast, efficient and reliable dispatch of information. Our Law Enforcement Alerting Portal (L.E.A.P.), is the most advanced and efficient primary alerting portal available to law enforcement nationwide."/>
+		<mx:Text width="100%" text="We provide the tools parents and guardians need to be proactive in the safeguarding of children. The My Child ID™ provides the solution law enforcement agencies need to quickly obtain the necessary identification information to issue an AMBER™ Alert and respond to a child abduction or disappearance. "/>
+		<mx:Text width="100%" text="Our services are available to law enforcement agencies at no cost. We support our efforts through Corporate Sponsorships, Alerting Partners and the sale of the My Child ID™. "/>
+		<mx:Text width="100%" text="We neither seek nor accept government funding. "/>
+		<mx:Text width="100%" text="A portion of the proceeds from the sale of every My Child ID™ will be donated to non-profit organizations serving low-income children and families. "/>		
+		<mx:Text width="100%" text="Mentors: Josef Salyer, Ryan Wheelock, Yee Fung"/>
+		<mx:Text width="100%" text="Developers:  Logan Levya, Rong Chen, Thomas Lamey, Kenward Thai"/>	
+		<s:Label text="Support" textDecoration="underline" color="#77b931" useHandCursor="true" buttonMode="true" click="navtoSupport()"/>
+	</s:VGroup>	 
+
+<!--	<s:Group width="100%">
+		<s:layout><s:HorizontalLayout/></s:layout>
+		<mx:Spacer width="100%"/>
+		<s:Button  height="25" label="support" id="support" click="navtoSupport()"/>
+		<s:Button  height="25" label="Close"  id="aboutClose" />
+		<mx:Spacer width="3%"/>
+	</s:Group>	
+-->	
+				
+</s:Group>

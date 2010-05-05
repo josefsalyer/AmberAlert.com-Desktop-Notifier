@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:skins="com.amberalert.desktop.views.skins.*">
 
 	<s:layout><s:VerticalLayout/></s:layout>
 
@@ -14,9 +14,12 @@
 			import com.amberalert.desktop.models.Person;
 			import com.amberalert.desktop.models.Vehicle;
 			
+			import mx.collections.ArrayCollection;
+			
 
 			private var index:int;
 			private var _currentAlert:AMBERAlert;
+			[Bindable] public var currentAlerts:ArrayCollection; 
 			[Bindable] private var _currentSuspect:Person = new Person();
 			[Bindable] private var _currentVictim:Person = new Person();
 			[Bindable] private var _currentLocation:Location = new Location();
@@ -91,15 +94,14 @@
 				// dispatch an event to be routed to glue and then routed to alertscontroller
 				dispatchEvent(new Event('listView'));
 			}
+			public var alertCount:int = 0;
 		]]>
 	</fx:Script>
-
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	<s:Label text="No ACTIVE AMBER Alerts" visible="{!alertExists}" includeInLayout="{!alertExists}"/>
+	<s:Label  text="No ACTIVE AMBER Alerts" visible="{!alertExists}" includeInLayout="{!alertExists}"/>
+	<s:List height="100%" width="100%" dataProvider="{currentAlerts}" skinClass="com.amberalert.desktop.views.skins.ListSkin" itemRenderer="com.amberalert.desktop.views.skins.AlertRenderer"/>
+<!--
+	<s:Label  text="No ACTIVE AMBER Alerts" visible="{!alertExists}" includeInLayout="{!alertExists}"/>
 	
-	<!--
 	<s:Label text="AMBER Alerts" visible="{alertExists}" includeInLayout="{alertExists}"/>
 	<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
 		<s:layout><s:HorizontalLayout/></s:layout>
@@ -121,114 +123,12 @@
 			<s:Label text = "Get the word out"/>
 		</s:Group>
 	</s:Group>
-	
-	<mx:Button label="Back to List" click= "()"/>
-	-->
-	
-	<s:Label  text="AMBER Alert" visible="{alertExists}" includeInLayout="{alertExists}"/>
-	<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
-		<s:layout><s:HorizontalLayout/></s:layout>
-		<mx:Button label="Return to list" click= "listView()"/>
-	</s:Group>
-	<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
-		<s:layout><s:HorizontalLayout/></s:layout>
-		<s:Group>
-			<s:layout><s:VerticalLayout/></s:layout>
-			<s:Label  text="Victim"/>
-			<mx:Image  width="200" height="200" click= "alertSiteInfo_clickHandler(event)" source="{_currentVictim.picture}"/>
-			<mx:Form>			
-				<mx:FormItem label = "Name:">
-					<s:Label  text= "{_currentVictim.name}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Gender:">
-					<s:Label  text="{_currentVictim.gender}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Age:">
-					<s:Label  text="{_currentVictim.age}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Height:">
-					<s:Label  text="{_currentVictim.height}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Weight:">
-					<s:Label  text="{_currentVictim.weight}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Hair:">
-					<s:Label  text="{_currentVictim.hair}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Eyes:">
-					<s:Label  text="{_currentVictim.eyes}"/>			
-				</mx:FormItem>
-			</mx:Form>			
-		</s:Group>		
-		<s:Group>
-			<s:layout><s:VerticalLayout/></s:layout>
-			<s:Label  text="Suspect"/>
-			<mx:Image  width="200" height="200" click= "alertSiteInfo_clickHandler(event)" source="{_currentSuspect.picture}"/>
-			<mx:Form>				
-				<mx:FormItem label = "Name:">
-					<s:Label  text="{_currentSuspect.name}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Gender:">
-					<s:Label  text="{_currentSuspect.gender}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Age:">
-					<s:Label  text="{_currentSuspect.age}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Height:">
-					<s:Label  text="{_currentSuspect.height}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Weight:">
-					<s:Label  text="{_currentSuspect.weight}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Hair:">
-					<s:Label  text="{_currentSuspect.hair}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Eyes:">
-					<s:Label  text="{_currentSuspect.eyes}"/>			
-				</mx:FormItem>
-			</mx:Form>			
-		</s:Group>	
-		<s:Group>
-			<s:layout><s:VerticalLayout/></s:layout>
-			<s:Label  text="Vehicle"/>
-			<mx:Image  width="200" height="200" click= "alertSiteInfo_clickHandler(event)" source="{_currentVehicle.picture}"/>
-			<mx:Form>
-				
-				<mx:FormItem label = "Make:">
-					<s:Label  text="{_currentVehicle.make}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Model:">
-					<s:Label  text="{_currentVehicle.model}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Year:">
-					<s:Label  text="{_currentVehicle.year}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Plate:">
-					<s:Label  text="{_currentVehicle.plate}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "Color:">
-					<s:Label  text="{_currentVehicle.color}"/>			
-				</mx:FormItem>
-			</mx:Form>			
-		</s:Group>	
-		<s:Group>
-			<s:layout><s:VerticalLayout/></s:layout>
-			<s:Label  text="Location"/>
-			<mx:Image  id="mapImage" width="200" height="200" source="{googleMapLink}" click= "mapImage_clickHandler(event)" />
-			<mx:Form>				
-				<mx:FormItem label = "City:">
-					<s:Label  text="{_currentLocation.city}"/>			
-				</mx:FormItem>
-				<mx:FormItem label = "State:">
-					<s:Label  text="{_currentLocation.province}"/>			
-				</mx:FormItem>
-			</mx:Form>			
-		</s:Group>
-	</s:Group>
 	<s:Group visible="{alertExists}" includeInLayout="{alertExists}">
 		<s:layout><s:HorizontalLayout/></s:layout>
 		<mx:Button label="Prev" click= "prevAlert()"/>
 		<mx:Button label="Next" click= "nextAlert()"/>
 	</s:Group>
+>>>>>>> skinningAppTom:src/com/amberalert/desktop/views/NotificationView.mxml
+	-->
 </s:Group>
 

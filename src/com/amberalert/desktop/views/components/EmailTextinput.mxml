@@ -51,5 +51,5 @@
 	<fx:Declarations>
 		<mx:EmailValidator id="emailValidator" source="{textInput}" property="text" trigger="{textInput}" triggerEvent="valueCommit" valid="validInput()" invalid="invalidInput()"/>
 	</fx:Declarations>
-	<controls:PromptingTextInput prompt="Email Address" id="textInput" text="{text}" valueCommit="textInput_valueCommitHandler(event)"/>
+	<controls:PromptingTextInput prompt="Email Address" id="textInput" text="{text}" width="100%" valueCommit="textInput_valueCommitHandler(event)"/>
 </s:Group>

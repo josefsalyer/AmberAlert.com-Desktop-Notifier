@@ -1,183 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:components="com.amberalert.desktop.views.components.*" xmlns:lookups="com.amberalert.desktop.models.lookups.*">
-
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%" 
+		 xmlns:components="com.amberalert.desktop.views.components.*" 
+		 xmlns:lookups="com.amberalert.desktop.models.lookups.*">
+	<s:layout><s:VerticalLayout/></s:layout>
+	
 	<fx:Metadata>
 		[Event(name="closeSetup", type="flash.events.Event")]
 		[Event(name="finishSetup", type="flash.events.Event")]
 	</fx:Metadata>
+	
 	<fx:Script>
 		<![CDATA[
-			import com.amberalert.desktop.models.User;
-			
 			import flash.events.Event;
 			
-			import mx.controls.Alert;
-			import mx.controls.TextInput;
+			[Bindable] public var st_settings :String = "Setup";
 			
-			private var _userPrefs:User;
-			
-			// When the user is set we want to set the combobox to have the correct state in it
-			[Bindable] public function set userPrefs(value:User):void
+			private function doneFirstRun():void
 			{
-				_userPrefs = value;
-				
-				if(cmbStates != null)
-				{
-					setProvince();
-				}
+				if(settingComp.saveSetting())
+					dispatchEvent(new Event('finishSetup'));
 			}
-			
-			public function get userPrefs():User
-			{
-				return _userPrefs;	
-			}
-			
-			// Sets the state combobox dependent on the user's state that was entered before
-			private function setProvince():void
-			{
-				if(userPrefs != null)
-				{
-					for(var i:int=0; i<provinces.US.length;i++)
-					{
-						if(provinces.US[i].abbr == userPrefs.province)
-						{
-							cmbStates.selectedIndex = i;
-							return;
-						}
-					}
-				}
-			}
-			
-			private function finish1():void {
-				userPrefs.province = cmbStates.selectedItem.abbr;
-				this.currentState='fr2';
-			}
-			
-			private function finish2():void{
-				var canChangeState:Boolean = true;
-				
-				if(chkEmail.selected)
-				{
-					if(!cmpEmail.isValid || cmpEmail.textInput.text == "")
-					{
-						lblEmailError.visible = true;
-						canChangeState = false;
-					}
-					else
-						lblEmailError.visible = false;
-				}
-				
-				if(chkSMS.selected)
-				{
-					if(!cmpCell.isValid || cmpCell.textInput.text == "")
-					{
-						lblPhoneError.visible = true;
-						canChangeState = false;
-					}
-					else
-						lblPhoneError.visible = false;
-				}
-				
-				if(canChangeState)
-				{
-					userPrefs.subscribeSMS = chkSMS.selected;
-					if(userPrefs.subscribeSMS)
-						userPrefs.cellNumber = cmpCell.textInput.text;
-					
-					userPrefs.subscribeEmail = chkEmail.selected;
-					if(userPrefs.subscribeEmail)
-						userPrefs.email = cmpEmail.textInput.text;
-					
-					this.currentState = "fr3";
-				}
-			}
-			
-			private function finish3():void {
-				userPrefs.firstRunCompleted = true;
-				dispatchEvent(new Event('saveUser'));
-				dispatchEvent(new Event("finishSetup"));
-			}
-			
-			private function chkSMS_Checked():void
-			{
-				cmpCell.enabled=chkSMS.selected;
-				if(!chkSMS.selected)
-					lblPhoneError.visible = false;
-			}
-			
-			private function chkEmail_Checked():void
-			{
-				cmpEmail.enabled=chkEmail.selected;
-				if(!chkEmail.selected)
-					lblEmailError.visible = false;
-			}
-			
 		]]>
 	</fx:Script>
-	<s:states>
-		<s:State name="fr1"/>
-		<s:State name="fr2"/>
-		<s:State name="fr3"/>
-	</s:states>
+	<components:SettingComp id="settingComp"/>
 	
-	<fx:Declarations>
-		<lookups:Provinces id="provinces"/>
-	</fx:Declarations>
-	<!-- fr1 -->
-	<s:VGroup includeIn="fr1" height="100%" width="100%" paddingTop="5" paddingLeft="5" paddingBottom="5" paddingRight="5">
-		<s:Label text="Amber Alert Setup" fontSize="32" />
-		<s:Label text="Step 1 - Personalize" fontSize="24" />
-		<s:Label text="Select a state if you want to receive{'\n'}alerts for that state only." />
-		<s:HGroup verticalAlign="middle">
-			<s:Label text="Select a state:" />
-			<mx:ComboBox id="cmbStates" dataProvider="{provinces.US}" labelField="name" prompt="Select a State" selectedIndex="0" />
-		</s:HGroup>
-		<mx:Spacer height="100%" />
-		<s:HGroup width="100%">
-			<s:Button label="Cancel" id="fr1_btnCancel" click="dispatchEvent(new Event('closeSetup'))" />
-			<mx:Spacer width="100%" />
-			<s:Button label="Back" enabled="false" id="fr1_btnBack" />
-			<s:Button label="Next" id="fr1_btnNext" click="finish1()"/>
-		</s:HGroup>
-	</s:VGroup>
-	
-	<!-- fr2 -->
-	<s:VGroup includeIn="fr2" height="100%" width="100%" paddingTop="5" paddingLeft="5" paddingBottom="5" paddingRight="5">
-		<s:Label text="Amber Alert Setup" fontSize="32" />
-		<s:Label text="Step 2 - Subscriptions" fontSize="24" />
-		<s:Label text="Select the service from which you want{'\n'}to subscribe to receive alerts in real time." />
-		<s:HGroup verticalAlign="middle">
-			<s:CheckBox label="Email:" id="chkEmail" selected="{userPrefs.subscribeEmail}" change="{chkEmail_Checked();}" />
-			<components:EmailTextinput id="cmpEmail" required="{chkEmail.selected}" enabled="{chkEmail.selected}" text="{userPrefs.email}"/>
-			<s:Label id="lblEmailError" text="*required" color="0xFF0000" visible="false" />
-		</s:HGroup>
-		<s:HGroup>
-			<s:CheckBox label="Text Messaging:" id="chkSMS" selected="{userPrefs.subscribeSMS}" change="{chkSMS_Checked();}" />
-			<components:PhoneTextinput id="cmpCell" required="{chkSMS.selected}" enabled="{chkSMS.selected}" text="{userPrefs.cellNumber}"/>
-			<s:Label id="lblPhoneError" text="*required" color="0xFF0000" visible="false" />
-		</s:HGroup>
-		<mx:Spacer height="100%"/>
-		<s:HGroup width="100%">
-			<s:Button label="Cancel" id="fr2_btnCancel" click="dispatchEvent(new Event('closeSetup'))" />
-			<mx:Spacer width="100%" />
-			<s:Button label="Back" id="fr2_btnBack" click="this.currentState='fr1'" />
-			<s:Button label="Next" click="finish2()" id="fr2_btnNext" />
-		</s:HGroup>
-	</s:VGroup>
-	
-	<!-- fr3 -->
-	<s:VGroup includeIn="fr3" width="100%" height="100%" paddingTop="5" paddingLeft="5" paddingBottom="5" paddingRight="5">
-		<s:Label text="Amber Alert Setup" fontSize="32"/>
-		<s:Label text="Setup Complete!" fontSize="24"/>
-		<s:Label text="Congratulations, you've completed setup!{'\n'}Click 'Finish' to run the Amber Alert Desktop Notifier." />
-		<mx:Spacer height="100%" />
-		<s:HGroup width="100%">
-			<s:Button label="Cancel" id="fr3_btnCancel" click="dispatchEvent(new Event('closeSetup'))" />
-			<mx:Spacer width="100%"/>
-			<s:Button label="Back" id="fr3_btnBack" click="this.currentState='fr2'" />
-			<s:Button label="Finish!" id="fr3_btnNext" click="finish3()"/>
-		</s:HGroup>
-	</s:VGroup>
+	<s:Group width="100%">
+		<s:layout><s:HorizontalLayout/></s:layout>
+		<mx:Spacer width="100%"/>
+		<s:Button  height="25" label="Close"  id="settingCancel" click="dispatchEvent(new Event('closeSetup'))"/>
+		<s:Button  height="25" label="Apply" id="settingApply" click="doneFirstRun()"/>
+		<mx:Spacer width="3%"/>
+	</s:Group>	
 </s:Group>

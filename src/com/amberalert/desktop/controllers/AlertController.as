@@ -10,6 +10,7 @@ package com.amberalert.desktop.controllers
 	import flash.utils.Timer;
 	
 	import mx.collections.ArrayCollection;
+	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	import mx.rpc.http.HTTPService;
 	
@@ -43,7 +44,7 @@ package com.amberalert.desktop.controllers
 		public function set currentLoc(value:String):void
 		{
 			_currentLoc = value;
-			if(destination != Destinations.FIRST_RUN)
+			if(value != '')
 			{
 				recentAlerts = new XML();
 				alertFeed.send();
@@ -54,6 +55,7 @@ package com.amberalert.desktop.controllers
 		{
 			return _currentLoc;
 		}
+		
 		
 		public function set currentState(value:String):void
 		{
@@ -88,9 +90,12 @@ package com.amberalert.desktop.controllers
 			recentAlerts = new XML();
 			arcAlerts = SharedObject.getLocal("alertData");
 			alertFeed = new HTTPService();
-			alertFeed.url = 'https://amberleapalerts.s3.amazonaws.com/alerts-test.xml';
+			alertFeed.url = 'https://amberleapalerts.s3.amazonaws.com/alerts.xml';
 			alertFeed.resultFormat = 'e4x';
 			alertFeed.addEventListener(ResultEvent.RESULT,alertFeedResult);
+			alertFeed.addEventListener(FaultEvent.FAULT, handleFault);
+			
+			
 			timer = new Timer(10000);
 			timer.addEventListener(TimerEvent.TIMER, pullAlerts);
 		}
@@ -139,11 +144,12 @@ package com.amberalert.desktop.controllers
 			
 			if(temp.contains(recentAlerts)) 
 			{
-				trace('there have been no changes')
+				//trace('there have been no changes')
 			} 
 			else 
 			{
-				var stateAlerts:Array = parser.parseAmberAlerts(currentLoc, event.result as XML); 
+				var stateAlerts:Array = parser.parseAmberAlerts(currentLoc, event.result as XML);
+				if(alerts == null) alerts = new ArrayCollection();
 				alerts.source = stateAlerts;
 				recentAlerts = temp;
 				
@@ -151,27 +157,25 @@ package com.amberalert.desktop.controllers
 				alertIndex = 0;
 				if(alerts != null)
 				{
-					if(alerts.source[currentLoc].length == 0)
+					if(alerts.length == 0)
 						currentAlert = null;
-					//else if (currentAlert == alerts.getItemAt(alertIndex)  || alertCount > alerts.length)
-					//else if (currentAlert == stateAlerts[currentLoc].getItemAt(alertIndex))
 					else if (arcAlerts.data.alertData == alerts)
 					{
-						currentAlert = alerts.source[currentLoc].getItemAt(alertIndex) as AMBERAlert;
-						alertCount = alerts.source[currentLoc].length;
+						currentAlert = alerts.getItemAt(alertIndex) as AMBERAlert;
+						alertCount = alerts.length;
 					}
 					else
 					{
-						currentAlert = alerts.source[currentLoc].getItemAt(alertIndex) as AMBERAlert;
-						alertCount = alerts.source[currentLoc].length;
+						currentAlert = alerts.getItemAt(alertIndex) as AMBERAlert;
+						alertCount = alerts.length;
 						dispatchEvent(new Event('showNotification'));
 					}
 				}	
 			}
 			
-			if(alerts.source[currentLoc] == null)
+			if(alerts == null)
 				alertExists = false;
-			else if(alerts.source[currentLoc].length == 0)
+			else if(alerts.length == 0)
 				alertExists = false;
 			else
 			{
@@ -195,7 +199,7 @@ package com.amberalert.desktop.controllers
 		 **/
 		public function pullAlerts(e:TimerEvent=null):void
 		{
-			if(ConnectionChecker.internets)
+			if(ConnectionChecker.internets && e != null)
 			{
 				alertFeed.send();
 			}
@@ -205,7 +209,12 @@ package com.amberalert.desktop.controllers
 			}
 		}
 		
-		//A event from the notification view will be routed to here
+		protected function handleFault(fault:FaultEvent):void
+		{
+			trace(fault.fault);	
+		}
+		
+		/*//A event from the notification view will be routed to here
 		public function nextAlert():void
 		{
 			//TO DO increment the index and set the current alert
@@ -231,6 +240,6 @@ package com.amberalert.desktop.controllers
 					alertIndex = alerts.source[currentLoc].length - 1;	
 				currentAlert = alerts.source[currentLoc].getItemAt(alertIndex) as AMBERAlert;
 			}
-		}
+		}*/
 	}
 }

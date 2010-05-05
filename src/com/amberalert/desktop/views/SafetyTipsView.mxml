@@ -7,7 +7,7 @@
 		<models:SafetyTip id="currentSafetyTip"/>
 	</fx:Declarations>
 	
-	<s:Label text="{currentSafetyTip.title}"/>
+	<s:Label  text="{currentSafetyTip.title}"/>
 	<s:TextArea editable="false" borderVisible="false" width="100%" text="{currentSafetyTip.description}"/>
 	
 </s:Group>

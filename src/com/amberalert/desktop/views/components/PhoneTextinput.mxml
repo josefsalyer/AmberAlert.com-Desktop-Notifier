@@ -45,5 +45,5 @@
 	<fx:Declarations>
 		<mx:PhoneNumberValidator id="phoneValidator" source="{textInput}" property="text" trigger="{textInput}" triggerEvent="valueCommit" valid="validInput()" invalid="invalidInput()"/>
 	</fx:Declarations>
-	<controls:PromptingTextInput prompt="Cell Phone Number" id="textInput" text="{text}" valueCommit="textInput_valueCommitHandler(event)"/>
+	<controls:PromptingTextInput maxChars="14" prompt="Cell Phone Number" id="textInput" text="{text}" width="100%" valueCommit="textInput_valueCommitHandler(event)"/>
 </s:Group>

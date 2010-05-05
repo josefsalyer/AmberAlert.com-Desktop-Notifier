@@ -6,7 +6,6 @@ package com.amberalert.desktop.controllers
 	import com.amberalert.desktop.models.Person;
 	import com.amberalert.desktop.models.Vehicle;
 	import com.amberalert.desktop.models.lookups.Provinces;
-	import com.amberalert.desktop.models.Data;
 	
 	import mx.collections.ArrayCollection;
 	
@@ -67,6 +66,7 @@ package com.amberalert.desktop.controllers
 							victim.hair = vic.@hairColor;
 							victim.eyes = vic.@eyeColor;
 							victim.picture = vic.@thumbnailURL;
+							victim.description = chopString(vic.@identityFeatures);
 							
 							alert.victims.addItem(victim);
 						}
@@ -84,6 +84,7 @@ package com.amberalert.desktop.controllers
 							suspect.hair = sus.@hairColor;
 							suspect.eyes = sus.@eyeColor;
 							suspect.picture = sus.@thumbnailURL;
+							suspect.description = chopString(sus.@identityFeatures);
 							
 							alert.suspects.addItem(suspect);
 						}
@@ -114,12 +115,20 @@ package com.amberalert.desktop.controllers
 						}
 						
 						if(stateAlerts[thisAlert.@province] == null) 
-							stateAlerts[thisAlert.@province] = new ArrayCollection(); //creates a new arrayCollection with the state abbr. as the index
+							stateAlerts[thisAlert.@province] = new Array(); //creates a new arrayCollection with the state abbr. as the index
 								
-						stateAlerts[thisAlert.@province].addItem(alert);
+						stateAlerts[thisAlert.@province].push(alert);
 				}
 				
-			return stateAlerts;
+				return stateAlerts[currentLoc];
+		}
+		
+		private function chopString(inputString:String):String{
+			var maxDescriptionLengthMinusThree:int = 65;
+			if(inputString.length > maxDescriptionLengthMinusThree)
+				return inputString.substring(0, maxDescriptionLengthMinusThree) + "...";
+			else
+				return inputString;
 		}
 	}
 }

@@ -8,6 +8,7 @@ package com.amberalert.desktop.controllers
 	import flash.utils.Timer;
 	
 	import mx.collections.ArrayCollection;
+	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	import mx.rpc.http.HTTPService;
 
@@ -50,11 +51,18 @@ package com.amberalert.desktop.controllers
 			safetyFeed.url = 'http://www.amberalert.com/category/tips/feed/';
 			safetyFeed.resultFormat = 'object';
 			safetyFeed.addEventListener(ResultEvent.RESULT,safetyTipResult);
+			safetyFeed.addEventListener(FaultEvent.FAULT,faultHandler);
 			
 			safetyTips = new ArrayCollection();
 			startTipTimer();
 		}
 		
+		/**
+		 * grabSafetyTips
+		 *
+		 * If there is a valid internet connection new safety tips are 
+		 * pulled, otherwise it loads previously saved safety tips
+		 **/ 
 		public function grabSafetyTips():void
 		{
 			if(ConnectionChecker.internets)
@@ -69,6 +77,11 @@ package com.amberalert.desktop.controllers
 			}
 		}
 		
+		/**
+		 * startTipTimer
+		 *
+		 * Starts safety tip refresh timer.
+		 **/ 
 		protected function startTipTimer():void
 		{
 			timer = new Timer(10000);
@@ -79,10 +92,9 @@ package com.amberalert.desktop.controllers
 		}
 		
 		/**
-		 * safetyTipResult
+		 * stopTipTimer
 		 *
-		 * Event listener that is called when new safety
-		 * tips are pulled down from the cloud.
+		 * Stops safety tip refresh timer.
 		 **/ 
 		protected function stopTipTimer():void
 		{
@@ -90,11 +102,26 @@ package com.amberalert.desktop.controllers
 			timer.stop();
 		}
 		
+		/**
+		 * safetyTipResult
+		 *
+		 * Event listener that is called when new safety
+		 * tips are pulled down from the cloud.
+		 **/ 
 		protected function safetyTipResult(event:ResultEvent):void
 		{
 			tipIndex = 0;
 			safetyTips = event.result.rss.channel.item;
 			setCurrSafetyTip(safetyTips[tipIndex]);
+		}
+		
+		/**
+		 * safetyTipFault
+		 * 
+		 * **/
+		protected function faultHandler(fault:FaultEvent):void
+		{
+			trace(fault);
 		}
 		
 		/**

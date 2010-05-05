@@ -3,7 +3,7 @@
 				   xmlns:s="library://ns.adobe.com/flex/spark" 
 				   xmlns:mx="library://ns.adobe.com/flex/halo">
 	<fx:Array id="providers">
-		<fx:Object data="teleflip.com" label=" Teleflip"/>
+		<fx:Object data="teleflip.com" label="Teleflip"/>
 		<fx:Object data="message.alltel.com" label="Alltel"/>
 		<fx:Object data="paging.acswireless.com" label="Ameritech"/>
 		<fx:Object data="txt.att.net" label="ATT Wireless"/>

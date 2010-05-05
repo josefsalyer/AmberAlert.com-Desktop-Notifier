@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="false" xmlns:lookups="com.amberalert.desktop.models.lookups.*">
+	<fx:Script>
+		<![CDATA[
+			import assets.icons.*;
+			
+			import com.amberalert.desktop.models.AMBERAlert;
+			import com.amberalert.desktop.models.Location;
+			import com.amberalert.desktop.models.Person;
+			
+			import mx.controls.Alert;
+			import mx.rpc.http.HTTPService;
+			
+			[Bindable] public var person		:	Person;
+			[Bindable] public var typeColor		:	uint = 0xA51421;
+			[Bindable] private var province		:	String;
+			[Bindable] private var alerturl		:	URLRequest;
+			[Bindable] private var provinceurl	:	URLRequest;
+			[Bindable] private var rssurl		:	URLRequest;
+			[Bindable] private var emailurl		:	URLRequest;
+			
+			
+			private var eventHandled:Boolean = false;
+			
+
+			
+			/** 
+			 * The renderer is set to the current alert
+			 */
+			public override function set data(value:Object):void
+			{
+				super.data = value;
+				person = value as Person;
+				invalidateProperties();
+			}
+			
+			public function set alert(value:AMBERAlert):void
+			{
+				alerturl = new URLRequest(value.url);
+			}
+			
+			public function set location(value:Location):void
+			{
+				for each(var prov:Object in provinces.US)
+				{
+					if(prov.abbr == value.province)
+					{
+						province = prov.name;
+						provinceurl = new URLRequest('http://www.amberalert.com/en/alerts/state/?type=' + province);
+						rssurl = new URLRequest('http://www.amberalert.com/category/' + province + '/feed/');
+						break;
+					}
+				}
+			}
+
+			protected function alert_clickHandler(event:MouseEvent):void
+			{
+				if(!eventHandled)
+				{
+					//URL to the alert is constructed and opened in new tab
+					navigateToURL(alerturl, "_blank");
+				}
+				else
+					eventHandled = false;
+			}
+
+
+			protected function province_clickHandler(event:MouseEvent):void
+			{
+				eventHandled = true;
+				//Redirect to State's alerts
+				navigateToURL(provinceurl, "_blank");
+			}
+			
+			protected function rss_clickHandler():void
+			{
+				eventHandled = true;
+				//Redirect to State's rss
+				navigateToURL(rssurl, "_blank");
+			}
+
+			protected function share_clickHandler(event:MouseEvent):void
+			{
+				if(event.currentTarget.id == "shareRss") {
+					rss_clickHandler();
+				} else {
+				var name:String = event.currentTarget.id as String;
+				dispatchEvent(new Event(name,true,false));
+				}
+			}
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<lookups:Provinces id="provinces"/>
+	</fx:Declarations>
+	<s:states>
+		<s:State id="normalState" name="normal" />
+		<s:State id="hoveredState" name="hovered"/>
+		<s:State id="selectedState" name="selected" />
+		<s:State id="normCaretState" name="normalAndShowsCaret"/>
+		<s:State id="hovCaretState" name="hoveredAndShowsCaret"/>
+		<s:State id="selCaretState" name="selectedAndShowsCaret"/>
+	</s:states>
+	<s:Rect radiusX="10" radiusY="10" width="100%" height="100%">
+		<s:fill>
+			<s:SolidColor color="#CCCCCC"/>
+		</s:fill>
+	</s:Rect>
+	<s:HGroup verticalAlign="middle" width="100%" height="100%" paddingBottom="20" paddingLeft="20" paddingRight="20" paddingTop="20">
+		<mx:Image source="{person.picture}" width="60" height="60" click="alert_clickHandler(event)" buttonMode="true"/>
+		<s:VGroup width="158">
+			<s:Label text="{person.name}" fontSize="18" width="100%" maxDisplayedLines="1"/>
+			<s:HGroup verticalAlign="middle">
+				<s:Label text="({person.gender}, Age {person.age})"/>
+				<s:Button label="{province}" fontSize="10" skinClass="com.amberalert.desktop.views.skins.RedLinkButton" useHandCursor="true" buttonMode="true" click="province_clickHandler(event)"/>
+			</s:HGroup>
+		</s:VGroup>
+		<s:Group width="200">
+			<mx:Text width="100%" text="{person.description}"/>	
+		</s:Group>
+		<s:HGroup width="100%">
+			<mx:Image id="shareEmail" source="/assets/icons/emailShareIcon.png" click="share_clickHandler(event)" buttonMode="true"/>
+			<mx:Image id="shareRss" source="/assets/icons/rssShareIcon.png" click="share_clickHandler(event)" buttonMode="true"/>
+			<mx:Image id="shareFacebook" source="/assets/icons/facebookShareIcon.png" click="share_clickHandler(event)" buttonMode="true"/>
+			<mx:Image id="shareTwitter" source="/assets/icons/twitterShareIcon.png" click="share_clickHandler(event)" buttonMode="true"/>
+		</s:HGroup>
+	</s:HGroup>
+</s:ItemRenderer>

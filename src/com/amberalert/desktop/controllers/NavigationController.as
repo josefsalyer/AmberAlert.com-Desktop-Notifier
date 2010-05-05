@@ -65,16 +65,23 @@ package com.amberalert.desktop.controllers
 			//Load system tray icon / dock icon.
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, prepareForSystray);
-			try {loader.load(new URLRequest("/assets/icons/aa16.png"));}
-			catch(error:Error){trace("Unable to load icon.");}
+			
+			try {
+				if(NativeApplication.supportsDockIcon) {
+					loader.load(new URLRequest("app:/assets/icons/128x128.png"));
+				} else {
+					loader.load(new URLRequest("app:/assets/icons/16x16.png"));
+				}
+			} catch(error:Error) {
+				trace("Unable to load icon.");
+			}
 		}
 		
 		/**
-		 * prepareForSystray
+		 * resizeAndMoveWindow
 		 * 
-		 * Function that loads Systray icon, sets the icon on the Systray.
-		 * 
-		 * @param var dockImage:BitmapData
+		 * Function that allows the user to adjust the size and position of the
+		 * application on their desktop.
 		 **/
 		public function resizeAndMoveWindow(width:Number=-100000,height:Number=-100000,x:Number=-100000,y:Number=-100000):void
 		{
@@ -91,6 +98,13 @@ package com.amberalert.desktop.controllers
 				NativeApplication.nativeApplication.activeWindow.y = y;
 		}
 		
+		/**
+		 * prepareForSystray
+		 * 
+		 * Function that loads Systray icon, sets the icon on the Systray.
+		 * 
+		 * @param var dockImage:BitmapData
+		 **/
 		private function prepareForSystray(event:Event):void 
 		{
 			//Retrieve the image being used as the systray/dock icon				
@@ -112,6 +126,11 @@ package com.amberalert.desktop.controllers
 			}
 		}
 		
+		/**
+		 * prepareMenu
+		 * 
+		 * Populates the system tray menu
+		 **/
 		public function prepareMenu():void
 		{
 			if(NativeApplication.supportsDockIcon) //Mac
@@ -271,10 +290,10 @@ package com.amberalert.desktop.controllers
 		}
 		
 		/**
-		 * notify
+		 * bringWindowToFront
 		 * 
-		 * Function that notifies the user of an event through the syetem
-		 * tray icon.
+		 * Allows the applcation to move to the front of all active windows
+		 * on the users desktop.
 		 **/
 		public function bringWindowToFront():void
 		{
@@ -282,6 +301,12 @@ package com.amberalert.desktop.controllers
 			stage.nativeWindow.orderToFront();
 		}
 		
+		/**
+		 * notify
+		 * 
+		 * Function that notifies the user of an event through the syetem
+		 * tray icon.
+		 **/
 		private function notify():void
 		{
 			if(NativeApplication.supportsDockIcon)
@@ -318,7 +343,7 @@ package com.amberalert.desktop.controllers
 		 *
 		 * Minimize the program to the system dock
 		 **/
-		private function dock():void 
+		public function dock():void 
 		{
 			currentState = Destinations.DOCKED;
 			stage.nativeWindow.visible = false;

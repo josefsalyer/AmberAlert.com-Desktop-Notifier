@@ -11,15 +11,23 @@
 	</fx:Script>
 	
 	<controllers:ConnectionChecker internetStatusChange="internetChange.execute()"/>
-	<controllers:ApplicationController id="app" alertExists="{alerts.alertExists}" setToFirstRun="nav.setCurrentView(Destinations.FIRST_RUN)"
-									   setToNotification="nav.showAlerts()" setToSafety="nav.setCurrentView(Destinations.SAFETY_TIPS)" 
-									   loadSystemTray="nav.prepareMenu()"/>
+	<controllers:ApplicationController id="app" 
+									   alertExists="{alerts.alertExists}" 
+									   setToFirstRun="nav.setCurrentView(Destinations.FIRST_RUN)"
+									   setToNotification="nav.showAlerts()" 
+									   setToSafety="nav.setCurrentView(Destinations.SAFETY_TIPS)" 
+									   loadSystemTray="nav.prepareMenu()" 
+									   emailSignUp="rs.emailSignupHandler(app.userPrefs.email, app.userPrefs.province)"
+									   smsSignUp="rs.smsSignupHandler(app.userPrefs.cellNumber,app.userPrefs.serviceProvider,app.userPrefs.province)"
+									   />
 	<controllers:FirstRunApplicationController id="frapp" />
 	<views:MainView id="mainview" />
 	<controllers:AlertController id="alerts" currentLoc="{app.userPrefs.province}" currentState="{nav.currentState}" showNotification="nav.showAlerts()"/>
 	<controllers:SafetyTipController id="safetytips"/>
 	
 	<controllers:NavigationController id="nav" alertExists="{alerts.alertExists}"/>
+	<controllers:RemoteServices id="rs" />
+	<controllers:ShareController id="share" />
 	
 	<Command id="init" stage="none">
 		<Action call="nav.loadNav(scope.stage)"/>
@@ -48,27 +56,42 @@
 		<Route event="{Destinations.SAFETY_TIPS}" call="{nav.setCurrentView(Destinations.SAFETY_TIPS)}" />
 		<Route event="{Destinations.SETTINGS}" call="{nav.setCurrentView(Destinations.SETTINGS)}" />
 	</Glue>
-	
-	<Glue match="FirstRunView">
-		<Inject userPrefs="{app.userPrefs}"/>
-		<Route event="saveUser" call="app.saveUserPrefs(view.userPrefs)"/>
-	</Glue>
+
 	
 	<Glue match="SafetyTipsView">
 		<Inject currentSafetyTip="{safetytips.currentTip}"/>
 	</Glue>
 	
 	<Glue match="NotificationView">
+		<Inject currentAlerts="{alerts.alerts}"/>
 		<Inject currentAlert="{alerts.currentAlert}"/>
 		<Inject alertExists="{alerts.alertExists}"/>
-		<Route event="nextAlert" call="alerts.nextAlert()"/>
-		<Route event="prevAlert" call="alerts.prevAlert()"/>
+		<!--<Route event="nextAlert" call="alerts.nextAlert()"/>
+		<Route event="prevAlert" call="alerts.prevAlert()"/>-->
 		<Route event="listView" call="{nav.setCurrentView(Destinations.SAFETY_TIPS)}"/> 
 	</Glue>
 	
-	<Glue match="SettingsView">
+	<Glue match="SettingComp">
 		<Inject userPrefs="{app.userPrefs}"/>
 		<Route event="saveUser" call="app.saveUserPrefs(view.userPrefs)"/>
 	</Glue>
 	
+	<Glue match="AlertRenderer">
+		 <Inject alerts="{alerts.alerts}"/>
+	</Glue>
+	
+	<Glue match="MainViewSkin">
+		<Inject alertNum="{alerts.alertCount}"/>
+		<Inject canSeeAlert="{app.userPrefs.firstRunCompleted}"/>
+		<Inject mainState="{nav.currentState}"/>
+		<Inject province="{app.userPrefs.province}"/>
+		<Route event="closeWindow" call="nav.dock()"/>
+	</Glue>
+	
+	<Glue match="AlertRenderer">
+		<Route event="shareFacebook" call="share.facebook(view.alert.url)" />
+		<Route event="shareTwitter" call="share.twitter(view.alert.url)" />
+		<Route event="shareEmail" call="share.email(view.alert.url)" />
+		<Route event="shareRss" call="share.rss()" />
+	</Glue>
 </GlueMap>

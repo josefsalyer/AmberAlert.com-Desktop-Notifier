@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:components="com.amberalert.desktop.views.components.*" xmlns:lookups="com.amberalert.desktop.models.lookups.*">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%" 
+		 xmlns:components="com.amberalert.desktop.views.components.*" 
+		 xmlns:lookups="com.amberalert.desktop.models.lookups.*">
 	<s:layout><s:VerticalLayout/></s:layout>
 	
 	<fx:Metadata>
@@ -11,174 +14,22 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import com.amberalert.desktop.models.User;
 			
 			import flash.events.Event;
 			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			
-			
 			[Bindable] public var st_settings :String = "Settings";
-			private var _userPrefs:User;
 			
-			//TO DO: create a bindable setter and getter function for userPrefs to determine what state is selected in the combobox
-			[Bindable] public function set userPrefs(value:User):void
-			{
-				_userPrefs = value;
-				
-				if(settingProvince != null)
-					setProvince();
-				
-				if(settingPhone != null)
-					setProvider();
-			}
-			
-			public function get userPrefs():User
-			{
-				return _userPrefs;	
-			}
-			
-		
-			
-			private function setProvince():void
-			{
-		
-				if(userPrefs != null)
-				{
-					for(var i:int=0; i<provinces.US.length;i++)
-					{
-						if(provinces.US[i].abbr == userPrefs.province)
-						{
-							settingProvince.selectedIndex = i;
-							return;
-						}
-					}
-				}
-				
-				settingProvince.selectedIndex = -1;
-			}
-			
-			private function setProvider():void
-			{
-				if(userPrefs != null)
-				{
-					//	settingPhoneProviders.selectedIndex = 4;
-					for(var i:int=0; i <serviceProviders.providers.length; i++)
-					{
-						//	Alert.show(userPrefs.serviceProvider);
-						if(serviceProviders.providers[i].label == userPrefs.serviceProvider)
-						{
-							settingPhoneProviders.selectedIndex = i;
-							break;
-						}
-						
-					}
-				}
-			
-			}
-			
-			private function saveSetting():void
-			{
-				//need-to-do  check user input
-				if(settingProvince.selectedIndex != -1 && settingEmail.isValid)
-				{
-					userPrefs.email = settingEmail.text;
-					userPrefs.cellNumber = settingPhone.text;
-					userPrefs.subscribeSMS = subTxtMsg.selected;
-				//	userPrefs.subscribeRSS = subRSS.selected;
-					userPrefs.subscribeEmail = subEmail.selected;
-					userPrefs.storeAlerts = settingStoreAlert.selected;
-					userPrefs.serviceProvider = settingPhoneProviders.selectedLabel;
-					userPrefs.province = settingProvince.selectedItem.abbr;
-					
-					dispatchEvent(new Event('saveUser'));
-				}
-				else{
-					
-					if(subEmail.selected == true && settingEmail.text == "")
-						Alert.show("Please enter your email address!");
-					if(subTxtMsg.selected == true && settingPhone.text == "")
-						Alert.show("Please enter your phone Number!");
-					else
-						Alert.show("Invalid user information!");
-				}
-			}
-			
-			
-			
-
-			protected function subEmail_changeHandler(event:Event):void
-			{
-				settingEmail.enabled = subEmail.selected;	
-
-			}
-
-
-			protected function subTxtMsg_changeHandler(event:Event):void
-			{
-				settingPhone.enabled = subTxtMsg.selected;
-			}
-			
-
 		]]>
 	</fx:Script>
-	
 	<fx:Declarations>
-		<lookups:Provinces id="provinces"/>
-		<lookups:Providers id="serviceProviders"/>
 	</fx:Declarations>
+	<components:SettingComp id="settingComp"/>
 	
-	<s:Label fontSize="20" text="amberalert Desktop Notification Setting"></s:Label>
-	<s:Group>
-		<s:layout><s:HorizontalLayout/></s:layout>
-		<s:Group>
-			<s:layout><s:VerticalLayout/></s:layout>
-			<s:Label fontWeight="bold" text="Personal Setting"/>
-			<mx:Form paddingTop="0">
-			<mx:FormItem>
-					<s:CheckBox label="Email" id="subEmail" change="subEmail_changeHandler(event)" selected="{userPrefs.subscribeEmail}" />
-				</mx:FormItem>
-				<mx:FormItem>
-					<s:CheckBox label="Text Message" change="subTxtMsg_changeHandler(event)" id="subTxtMsg" selected="{userPrefs.subscribeSMS}"/>
-				</mx:FormItem>
-				
-			</mx:Form>
-			
-			
-			<s:Label fontWeight="bold" text="Misc. Options"/>
-			<s:CheckBox label="Store Alerts" id="settingStoreAlert" selected="{userPrefs.storeAlerts}"/>
-		</s:Group>
-		<s:Group>
-			<s:layout><s:VerticalLayout/></s:layout>
-			<s:Label fontWeight="bold" text="Subscription Setting"/>
-			<mx:Form paddingTop="0">
-				<mx:FormItem label="Email:">
-					<components:EmailTextinput id="settingEmail" required="{subEmail.selected}" text="{userPrefs.email}" enabled="{userPrefs.subscribeEmail}"/>
-				</mx:FormItem>
-				<mx:FormItem label="Phone#:">
-					<components:PhoneTextinput id="settingPhone" required="{subTxtMsg.selected}" text="{userPrefs.cellNumber}" enabled="{userPrefs.subscribeSMS}"/>
-				</mx:FormItem>
-				<mx:FormItem label="Phone Providers">
-					<mx:ComboBox id="settingPhoneProviders" dataProvider="{new ArrayCollection(serviceProviders.providers)}" labelField="label" prompt="Please Select the service" creationComplete="setProvider()"/>
-				</mx:FormItem>
-				<mx:FormItem label="*Province:">
-					<mx:ComboBox id="settingProvince" dataProvider="{new ArrayCollection(provinces.US)}" labelField="name" prompt="Please Select State" creationComplete="setProvince()"/>
-				</mx:FormItem>
-			</mx:Form>
-			
-			
-			
-			
-			
-			
-		</s:Group>
-	</s:Group>
 	<s:Group width="100%">
 		<s:layout><s:HorizontalLayout/></s:layout>
 		<mx:Spacer width="100%"/>
-		<s:Button label="Close"  id="settingCancel" click="dispatchEvent(new Event('cancelSetting'))"/>	
-		<s:Button label="Apply" id="settingApply" click="saveSetting()"/>
-		<mx:Spacer width="10%"/>
+		<s:Button  height="25" label="Close"  id="settingCancel" click="dispatchEvent(new Event('cancelSetting'))"/>
+		<s:Button  height="25" label="Apply" id="settingApply" click="settingComp.saveSetting()"/>
+		<mx:Spacer width="3%"/>
 	</s:Group>	
 </s:Group>

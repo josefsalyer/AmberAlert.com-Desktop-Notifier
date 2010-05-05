@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" 
+		 xmlns:lookups="com.amberalert.desktop.models.lookups.*" 
+		 xmlns:components="com.amberalert.desktop.views.components.*">
+	<s:layout><s:VerticalLayout/></s:layout>
+	<fx:Script>
+		<![CDATA[
+			import com.amberalert.desktop.controllers.PhoneFormatter;
+			import com.amberalert.desktop.models.User;
+			
+			import flash.events.Event;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			
+			private var _userPrefs:User;
+			
+			//TO DO: create a bindable setter and getter function for userPrefs to determine what state is selected in the combobox
+			[Bindable] public function set userPrefs(value:User):void
+			{
+				_userPrefs = value;
+				
+				if(settingProvince != null)
+					setProvince();
+				
+				if(settingPhone != null)
+					setProvider();
+			}
+			
+			public function get userPrefs():User
+			{
+				return _userPrefs;	
+			}
+			
+			private function setProvince():void
+			{
+				
+				if(userPrefs != null)
+				{
+					for(var i:int=0; i<provinces.US.length;i++)
+					{
+						if(provinces.US[i].abbr == userPrefs.province)
+						{
+							settingProvince.selectedIndex = i;
+							return;
+						}
+					}
+				}
+				
+				settingProvince.selectedIndex = -1;
+			}
+			
+			private function setProvider():void
+			{
+				if(userPrefs != null)
+				{
+					//	settingPhoneProviders.selectedIndex = 4;
+					for(var i:int=0; i <serviceProviders.providers.length; i++)
+					{
+						//	Alert.show(userPrefs.serviceProvider);
+						if(serviceProviders.providers[i].data == userPrefs.serviceProvider)
+						{
+							settingPhoneProviders.selectedIndex = i;
+							return;
+						}
+						
+					}
+				}
+				settingPhone.text = PhoneFormatter.format(settingPhone.text);
+			}
+			
+			private function isEmailValid():Boolean
+			{
+				if(subEmail.selected == false)
+					return true;
+				else
+				{
+					if(settingEmail.text == "")
+					{
+						Alert.show("Please enter your email address!");
+						return false;
+					}
+					else
+					{
+						return true;
+					}
+				}
+			}
+			
+			private function isPhoneValid():Boolean
+			{
+				if(subTxtMsg.selected == false)
+					return true;
+				else
+				{
+					if(settingPhone.text == "" || settingPhone.text == "Invalid Phone Number" )
+					{
+						Alert.show("Please enter your phone Number!");
+						return false;
+					}
+					else if(settingPhoneProviders.selectedIndex == -1)
+					{
+						Alert.show("Please select your phone provider!");
+						return false;
+					}
+					else
+					{
+						return true;
+					}
+					
+				}
+			}
+			
+			public function saveSetting():Boolean
+			{
+				//need-to-do  check user input
+			
+				if(settingProvince.selectedIndex == -1)
+				{
+					Alert.show("Please select the state!");
+					return false;
+				}
+				else
+				{
+					if(settingEmail.isValid && isPhoneValid() && isEmailValid())
+					{
+						if(subEmail.selected == true)
+						{
+							userPrefs.email = settingEmail.text;
+							//	userPrefs.subscribeRSS = subRSS.selected;
+							userPrefs.subscribeEmail = subEmail.selected;
+						}
+					
+						if(subTxtMsg.selected == true)
+						{
+							userPrefs.cellNumber = PhoneFormatter.strip( settingPhone.text );
+							userPrefs.subscribeSMS = subTxtMsg.selected;
+							//	userPrefs.storeAlerts = settingStoreAlert.selected;
+							userPrefs.serviceProvider = settingPhoneProviders.selectedItem.data;
+						}
+					
+						userPrefs.province = settingProvince.selectedItem.abbr;
+						userPrefs.firstRunCompleted = true;
+						dispatchEvent(new Event('saveUser'));
+						return true;
+					}
+					else
+						return false;
+				}
+
+			}
+			
+			protected function subEmail_changeHandler(event:Event):void
+			{
+				settingEmail.enabled = subEmail.selected;	
+				
+			}
+			
+			protected function subTxtMsg_changeHandler(event:Event):void
+			{
+				settingPhone.enabled = subTxtMsg.selected;
+				settingPhoneProviders.enabled = subTxtMsg.selected;
+			}
+			
+			protected function settingPhone_focusOutHandler(event:FocusEvent):void
+			{
+				settingPhone.text = PhoneFormatter.format(settingPhone.text);			
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<lookups:Provinces id="provinces"/>
+		<lookups:Providers id="serviceProviders"/>
+	</fx:Declarations>
+	<s:Label fontSize="15" fontWeight="bold" color="#3c3c3c" text="What kind of alerts would you like to receive?"></s:Label>
+	<s:Group>
+		<s:layout><s:HorizontalLayout gap="0" verticalAlign="middle"/></s:layout>
+		<s:Group>
+			<s:layout><s:VerticalLayout/></s:layout>
+			<mx:Form paddingTop="10">
+				<mx:FormItem>
+					<s:CheckBox label="Email" id="subEmail" change="subEmail_changeHandler(event)" selected="{userPrefs.subscribeEmail}" />
+				</mx:FormItem>
+				<mx:FormItem paddingLeft="0" paddingTop="15">
+					<s:CheckBox label="Text Message" change="subTxtMsg_changeHandler(event)" id="subTxtMsg" selected="{userPrefs.subscribeSMS}"/>
+				</mx:FormItem>			
+			</mx:Form>		
+		</s:Group>
+		
+		<s:Group>
+			<s:layout><s:VerticalLayout/></s:layout>
+			<mx:Form horizontalGap="0" verticalGap="10">
+				<mx:FormItem verticalGap="-20" label="Email:" paddingRight="0">
+					<components:EmailTextinput width="130" id="settingEmail" required="{subEmail.selected}" text="{userPrefs.email}" enabled="{userPrefs.subscribeEmail}"/>
+				</mx:FormItem>
+				<mx:FormItem paddingLeft="0" paddingTop="7" label="Phone #:">
+					<components:PhoneTextinput width="130" id="settingPhone" required="{subTxtMsg.selected}" focusOut="settingPhone_focusOutHandler(event)" text="{userPrefs.cellNumber}" enabled="{userPrefs.subscribeSMS}"/>
+				</mx:FormItem>		
+			</mx:Form>			
+		</s:Group>
+		
+		<s:Group>
+			<s:layout><s:VerticalLayout/></s:layout>
+			<mx:Form paddingLeft="0" paddingTop="57">
+				<mx:FormItem label="Provider:">
+					<mx:ComboBox id="settingPhoneProviders" dataProvider="{new ArrayCollection(serviceProviders.providers)}" enabled="{userPrefs.subscribeSMS}" labelField="label" prompt="Select Provider" creationComplete="setProvider()"/>
+				</mx:FormItem>			
+			</mx:Form>			
+		</s:Group>
+		
+	</s:Group>
+	
+	<s:Label paddingTop="30" fontSize="15" fontWeight="bold" color="#3c3c3c" text="Which states would you like to receive alerts from?"></s:Label>
+	<s:Group width="100%">		
+		<s:layout><s:HorizontalLayout/></s:layout>
+		<mx:Form horizontalGap="0" verticalGap="0" paddingTop="10" paddingLeft="30">
+			<mx:FormItem label="Province:">
+				<s:DropDownList width="150" id="settingProvince" alternatingItemColors="[#ffffff,#cccccc]" dataProvider="{new ArrayCollection(provinces.US)}" labelField="name" prompt="Please Select State" creationComplete="setProvince()">
+					<s:layout>
+						<s:VerticalLayout requestedRowCount="4" horizontalAlign="contentJustify" gap="0"/>
+					</s:layout>
+				</s:DropDownList>
+			</mx:FormItem>
+		</mx:Form>
+	</s:Group>
+</s:Group>

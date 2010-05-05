@@ -25,7 +25,7 @@ package com.amberalert.desktop.controllers
 		 **/
 		public function ConnectionChecker()
 		{
-			monitor = new URLMonitor(new URLRequest('http://amberalert.com'));
+			monitor = new URLMonitor(new URLRequest('http://www.amberalert.com'));
 			monitor.addEventListener(StatusEvent.STATUS, announceStatus);
 			monitor.start();		
 		}

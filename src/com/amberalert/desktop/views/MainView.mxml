@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Group width="100%" height="100%" 
+<s:SkinnableContainer width="100%" height="100%" 
 		 xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/halo"  
 		 xmlns:models="com.amberalert.desktop.models.*" 
-		 xmlns:views="com.amberalert.desktop.views.*"
-		 creationComplete="onLoad()" >
+		 xmlns:views="com.amberalert.desktop.views.*" 
+		 creationComplete="onLoad()" 
+		 contentBackgroundAlpha="0"
+		 skinClass="com.amberalert.desktop.views.skins.MainViewSkin">
 	<fx:Script>
 		<![CDATA[
 			import com.amberalert.desktop.models.*;
@@ -61,15 +63,16 @@
 	</s:states>
 	<fx:Declarations>
 		<models:User id="user" />
+		
 	</fx:Declarations>
 	
-	<views:FirstRunView id="fr" closeSetup="closeMe(event)" finishSetup="setupComplete()" includeIn="firstrun"/>
+	<views:FirstRunView id="firstrun" includeIn="firstrun" finishSetup="setupComplete()" closeSetup="closeMe(event)" />
 	<views:NotificationView id="notification" includeIn="notification" />
 	<views:SafetyTipsView id="safetytips" includeIn="safetytips"/>
 	<views:SettingsView id="settings" includeIn="settings" cancelSetting="closeMe(event)"/>
+	<views:AboutView id="about" includeIn="about"/>
 	<!--
 	waiting for merge of list view by Tom
 	<views:ListView id="listview" includeIn="listview"/>
 	-->
-	<s:Label includeIn="about" x="178" y="41" text="About us..."/>
-</s:Group>
+</s:SkinnableContainer>

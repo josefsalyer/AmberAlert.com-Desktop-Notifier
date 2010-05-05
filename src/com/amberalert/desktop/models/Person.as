@@ -12,5 +12,6 @@ package com.amberalert.desktop.models
 		public var hair:String;
 		public var eyes:String;
 		public var picture:String;
+		public var description:String;
 	}
 }

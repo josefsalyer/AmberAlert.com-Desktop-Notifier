@@ -2,11 +2,22 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					   xmlns:s="library://ns.adobe.com/flex/spark" 
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   xmlns:views="com.amberalert.desktop.views.*" xmlns:models="com.amberalert.desktop.models.*" xmlns:local="*" xmlns:controllers="com.amberalert.desktop.controllers.*"
-					   closing="mainview.closeMe(event)" showStatusBar="false" >
-
+					   xmlns:views="com.amberalert.desktop.views.*"
+					   xmlns:controllers="com.amberalert.desktop.controllers.*"
+					   xmlns:local="*"
+					   closing="mainview.closeMe(event)"
+					   showStatusBar="false"
+					   skinClass="com.amberalert.desktop.views.skins.MainAppSkin" 
+					   >
+	<fx:Script>
+		<![CDATA[
+			import com.amberalert.desktop.views.skins.MainAppSkin;
+		]]>
+	</fx:Script>
+	
 	<fx:Declarations>
 		<controllers:MainGlue id="mainGlue"/>
+		<!--<s:TraceTarget />-->
 	</fx:Declarations>
 	
 	<views:MainView id="mainview" />

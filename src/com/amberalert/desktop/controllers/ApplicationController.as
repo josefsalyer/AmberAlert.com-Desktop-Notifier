@@ -1,9 +1,13 @@
 package com.amberalert.desktop.controllers
 {
+	import air.update.ApplicationUpdaterUI;
+	import air.update.events.UpdateEvent;
+	
 	import com.amberalert.desktop.models.User;
 	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.filesystem.File;
 	import flash.net.SharedObject;
 	
 	import mx.controls.Alert;
@@ -12,6 +16,8 @@ package com.amberalert.desktop.controllers
 	[Event(name="setToNotification", type="flash.events.Event")]
 	[Event(name="setToSafety", type="flash.events.Event")]
 	[Event(name="loadSystemTray", type="flash.events.Event")]
+	[Event(name="emailSignUp", type="flash.events.Event")]
+	[Event(name="smsSignUp", type="flash.events.Event")]
 	
 	/**
 	 * ApplicationController
@@ -34,7 +40,7 @@ package com.amberalert.desktop.controllers
 		public var alertExists:Boolean;
 		public var internets:ConnectionChecker;
 
-		private var appUpdater:ApplicationUpdaterUI = new ApplicationUpdaterUI();
+		private var appUpdater:ApplicationUpdaterUI;
 		
 		/**
 		 * grabUserObject
@@ -49,7 +55,9 @@ package com.amberalert.desktop.controllers
 		public function grabUserObject():void
 		{
 			// Stuff to manage updates!
+			appUpdater = new ApplicationUpdaterUI();
 			appUpdater.configurationFile = new File("app:/updateConfig.xml");
+			appUpdater.addEventListener(UpdateEvent.INITIALIZED, updaterInitialized);
 			appUpdater.initialize();
 
 			sharedObj = SharedObject.getLocal("User");
@@ -71,6 +79,7 @@ package com.amberalert.desktop.controllers
 			else
 				dispatchEvent(new Event('setToFirstRun'));
 		}
+
 		/**
 		 * setupComplete
 		 * 
@@ -78,7 +87,6 @@ package com.amberalert.desktop.controllers
 		 * saves the entered data in the shared object for later use..
 		 * 
 		 * @param userPrefs:User
-		 * @author ASU Amber Alert Team
 		 **/
 		public function setupComplete():void
 		{
@@ -89,20 +97,57 @@ package com.amberalert.desktop.controllers
 				dispatchEvent(new Event('setToSafety'));
 		}
 		
+		/**
+		 * saveUserPrefs
+		 * 
+		 * Function that saves the user entered preferences to be
+		 * retrieved the next time the program is run.
+		 * 
+		 * @param userPrefs:User
+		 **/
 		public function saveUserPrefs(user:User):void
 		{
-			sharedObj.data.User = userPrefs;
-			sharedObj.flush();			
+			//first check to see if any of the data has changed from what is stored OR if it's new
+			if(user.subscribeEmail == true) {
+				if(user.email != null || user.email != sharedObj.data.User.email) {
+					userPrefs = user; //save the fresh data to the externally exposed current user data
+					dispatchEvent(new Event('emailSignUp')); //dispatch the event to main glue
+				}
+			}
+			
+			if(user.subscribeSMS == true) {
+				if(user.cellNumber != null || user.cellNumber != sharedObj.data.User.cellNumber) {
+					if(user.cellProvider != null) {
+						user.cellNumber = PhoneFormatter.strip(user.cellNumber);
+						userPrefs = user; //save the fresh data to the externally exposed current user data
+						dispatchEvent(new Event('smsSignUp')); //dispatch the event to main glue
+					}
+				}
+			}			
+			//finally save the freshest data to the shared object and everythign should be in sync
+			sharedObj.data.User = user;
+			sharedObj.flush();	
+			
 			
 			if(userPrefs.firstRunCompleted)
 			{
 				setupComplete();
 				dispatchEvent(new Event('loadSystemTray'));
-			}
-			else
+			} else {
 				dispatchEvent(new Event('setToFirstRun'));
-			
+			}
 			Alert.show("Settings have been successfully saved!");
+		}
+		
+		/**
+		 * updateInitialized
+		 * 
+		 * Checks to see if there have been any new versions of the
+		 * application posted to the hosting site.
+		 **/
+		private function updaterInitialized(event:UpdateEvent):void
+		{
+			appUpdater.checkNow();
 		}
 	}
 }

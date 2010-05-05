@@ -8,6 +8,5 @@ package com.amberalert.desktop.models
 		public static const SAFETY_TIPS	:String = 'safetytips'	;
 		public static const SETTINGS	:String = 'settings'	;
 		public static const ABOUT		:String = 'about'		;	
-		public static const LIST_VIEW   :String = 'listview'    ;
 	}
 }
